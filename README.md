@@ -1,36 +1,61 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# LeadBot — chat bot bilingv pentru captare lead-uri
 
-## Getting Started
+Un asistent de chat **bilingv (română / rusă)** care poartă o conversație scurtă
+cu vizitatorul site-ului, îi califică cererea și captează lead-ul — gândit pentru
+agenții imobiliare, dar ușor de adaptat oricărui domeniu.
 
-First, run the development server:
+**Demo live:** https://leadbot-imobiliar.vercel.app
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+![Next.js](https://img.shields.io/badge/Next.js_16-000000?style=flat&logo=nextdotjs&logoColor=white)
+![React](https://img.shields.io/badge/React_19-20232A?style=flat&logo=react&logoColor=61DAFB)
+![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=flat&logo=typescript&logoColor=white)
+![Tailwind](https://img.shields.io/badge/Tailwind_4-06B6D4?style=flat&logo=tailwindcss&logoColor=white)
+
+---
+
+## Ce face
+
+- **Bilingv RO / RU** — vizitatorul își alege limba, botul continuă în ea
+- **Califică lead-ul** — întreabă tipul tranzacției (cumpărare / chirie / vânzare),
+  tipul de imobil, zona, bugetul, apoi nume și telefon
+- **Widget de chat** flotant, se pune pe orice pagină
+- **Rezumat automat** al cererii la final, gata de preluat de un agent
+
+## Stack
+
+- **Next.js 16** (App Router) + **React 19** + **TypeScript**
+- **Tailwind CSS 4**
+- Fluxul conversației e **data-driven** (`src/lib/flow.ts`) — se adaugă sau se
+  reordonează întrebări fără să atingi componenta de UI
+
+## Structura
+
+```
+src/
+├── app/
+│   ├── page.tsx          # landing + widget
+│   └── layout.tsx
+├── components/
+│   └── ChatWidget.tsx    # widget-ul de chat (client component)
+└── lib/
+    └── flow.ts           # pașii conversației, bilingv, tipat
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Rulare locală
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+npm run dev
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Pe drum (roadmap)
 
-## Learn More
+- [ ] Backend: salvarea lead-urilor într-o bază de date (Supabase / Postgres)
+- [ ] Panou de admin cu login pentru a vedea lead-urile
+- [ ] Răspunsuri naturale cu AI (peste fluxul fix)
+- [ ] Conectare la WhatsApp
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Construit de [Alexandru Macovetchi](https://github.com/alex-macovetch1) ·
+[portofoliu](https://alex-macovetch1.github.io/portofoliu/)
