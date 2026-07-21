@@ -4,12 +4,24 @@ import { buildSystemPrompt } from "@/lib/prompt";
 import { getBusiness } from "@/lib/businesses";
 import { saveDemoLead } from "@/lib/leads";
 
+// The widget is embedded on other domains (the portfolio and clients' sites),
+// so the endpoint must allow cross-origin requests.
+const CORS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+export async function OPTIONS() {
+  return new Response(null, { status: 204, headers: CORS });
+}
+
 export async function POST(request: Request) {
   let body: { messages?: ChatMsg[]; biz?: string };
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400, headers: CORS });
   }
 
   const biz = getBusiness(body.biz);
@@ -20,7 +32,7 @@ export async function POST(request: Request) {
     reply = await chatComplete(buildSystemPrompt(biz), messages);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "AI error";
-    return NextResponse.json({ error: msg }, { status: 502 });
+    return NextResponse.json({ error: msg }, { status: 502, headers: CORS });
   }
 
   // The assistant appends a LEAD_JSON marker once it has name + phone.
@@ -43,5 +55,5 @@ export async function POST(request: Request) {
     reply = reply.replace(/LEAD_JSON:[\s\S]*$/, "").trim();
   }
 
-  return NextResponse.json({ reply, done });
+  return NextResponse.json({ reply, done }, { headers: CORS });
 }

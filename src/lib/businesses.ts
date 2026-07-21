@@ -93,10 +93,37 @@ const RESTAURANT: Business = {
   aiCollect: "the reservation date and time, and the number of people",
 };
 
+const ALEXWEB: Business = {
+  slug: "alexweb",
+  name: "Alexandru — Web & AI",
+  category: { ro: "Site-uri & AI · RO / RU", ru: "Сайты и AI · RO / RU" },
+  heroTitle: {
+    ro: "Site-uri moderne și asistenți AI pentru afacerea ta.",
+    ru: "Современные сайты и AI-ассистенты для вашего бизнеса.",
+  },
+  heroSub: {
+    ro: "Construiesc site-uri la preț fix și instalez chatboturi AI bilingve care prind clienți 24/7 — chiar ca acesta.",
+    ru: "Делаю сайты по фиксированной цене и ставлю двуязычных AI-ботов, которые ловят клиентов 24/7 — как этот.",
+  },
+  widgetTitle: { ro: "Asistentul lui Alexandru", ru: "Ассистент Александра" },
+  greeting: {
+    ro: "Bună! 👋 Sunt asistentul lui Alexandru. Vă pot spune cum vă facem un site sau un chatbot AI ca acesta. Cu ce afacere lucrați?",
+    ru: "Здравствуйте! 👋 Я ассистент Александра. Расскажу, как сделать вам сайт или AI-бота, как этот. Какой у вас бизнес?",
+  },
+  accent: "#7c3aed",
+  aiRole:
+    "a friendly assistant for Alexandru Macovetchi, a web developer in Moldova who builds modern websites and installs AI chat assistants for local businesses",
+  aiInfo:
+    "Alexandru builds fixed-price, modern, mobile-friendly websites (usually delivered in about 5 days) and installs bilingual Romanian/Russian AI chat assistants — exactly like the one the visitor is talking to now — that answer questions and capture leads 24/7. His portfolio includes an online store (WASD), an analytics dashboard (Playdex), a fullstack app (Senkai) and this AI chatbot (LeadBot). He works remotely with businesses across Moldova and offers a small monthly care plan for hosting and updates.",
+  aiCollect:
+    "what kind of business the visitor runs, and whether they want a website, an AI chatbot like this one, or another kind of help",
+};
+
 export const BUSINESSES: Record<string, Business> = {
   imobiliar: REALESTATE,
   dental: DENTAL,
   restaurant: RESTAURANT,
+  alexweb: ALEXWEB,
 };
 
 export const DEFAULT_SLUG = "imobiliar";
