@@ -1,44 +1,44 @@
 import { NextResponse } from "next/server";
 import { chatComplete, type ChatMsg } from "@/lib/ai";
-import { SYSTEM_PROMPT } from "@/lib/prompt";
-import { saveLead } from "@/lib/leads";
+import { buildSystemPrompt } from "@/lib/prompt";
+import { getBusiness } from "@/lib/businesses";
+import { saveDemoLead } from "@/lib/leads";
 
 export async function POST(request: Request) {
-  let body: { messages?: ChatMsg[] };
+  let body: { messages?: ChatMsg[]; biz?: string };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
+  const biz = getBusiness(body.biz);
   const messages = (body.messages ?? []).slice(-20); // keep the last turns only
 
   let reply: string;
   try {
-    reply = await chatComplete(SYSTEM_PROMPT, messages);
+    reply = await chatComplete(buildSystemPrompt(biz), messages);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "AI error";
     return NextResponse.json({ error: msg }, { status: 502 });
   }
 
-  // The assistant appends a LEAD_JSON marker once it has every field.
+  // The assistant appends a LEAD_JSON marker once it has name + phone.
   let done = false;
   const match = reply.match(/LEAD_JSON:\s*(\{[\s\S]*?\})/);
   if (match) {
     try {
       const data = JSON.parse(match[1]);
-      await saveLead({
+      await saveDemoLead({
+        biz: biz.slug,
         lang: data.lang ?? "ro",
-        deal: data.deal ?? "",
-        propertyType: data.propertyType ?? "",
-        zone: data.zone ?? "",
-        budget: data.budget ?? "",
         name: data.name ?? "",
         phone: data.phone ?? "",
+        details: data.details ?? "",
       });
       done = true;
     } catch {
-      /* if the marker was malformed, just don't save — the chat still works */
+      /* malformed marker — don't save, but keep the chat working */
     }
     reply = reply.replace(/LEAD_JSON:[\s\S]*$/, "").trim();
   }

@@ -1,12 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { GREETING, UI, type Lang } from "@/lib/flow";
+import { UI, type Lang } from "@/lib/flow";
+import type { Bilingual } from "@/lib/businesses";
 import type { ChatMsg } from "@/lib/ai";
 
 type Msg = { from: "bot" | "user"; text: string };
 
-export default function ChatWidget() {
+export type WidgetBiz = {
+  slug: string;
+  title: Bilingual;
+  greeting: Bilingual;
+  accent: string;
+};
+
+export default function ChatWidget({ biz }: { biz: WidgetBiz }) {
   const [open, setOpen] = useState(false);
   const [lang, setLang] = useState<Lang | null>(null);
   const [messages, setMessages] = useState<Msg[]>([]); // display
@@ -15,6 +23,7 @@ export default function ChatWidget() {
   const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const accent = biz.accent;
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
@@ -22,7 +31,7 @@ export default function ChatWidget() {
 
   function pickLanguage(l: Lang) {
     setLang(l);
-    setMessages([{ from: "bot", text: GREETING[l] }]);
+    setMessages([{ from: "bot", text: biz.greeting[l] }]);
   }
 
   async function send() {
@@ -40,7 +49,7 @@ export default function ChatWidget() {
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextConvo }),
+        body: JSON.stringify({ messages: nextConvo, biz: biz.slug }),
       });
       const data = await res.json();
       if (!res.ok || data.error) throw new Error(data.error || "error");
@@ -82,7 +91,8 @@ export default function ChatWidget() {
         <button
           onClick={() => setOpen(true)}
           aria-label={UI.openLabel[l]}
-          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full bg-emerald-600 px-5 py-3 text-white shadow-lg shadow-emerald-600/30 transition hover:bg-emerald-700"
+          style={{ backgroundColor: accent }}
+          className="fixed bottom-5 right-5 z-50 flex items-center gap-2 rounded-full px-5 py-3 text-white shadow-lg transition hover:brightness-95"
         >
           <ChatIcon />
           <span className="font-medium">{UI.openLabel[l]}</span>
@@ -92,15 +102,18 @@ export default function ChatWidget() {
       {open && (
         <div className="fixed bottom-5 right-5 z-50 flex h-[560px] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
           {/* header */}
-          <div className="flex items-center justify-between bg-emerald-600 px-4 py-3 text-white">
+          <div
+            style={{ backgroundColor: accent }}
+            className="flex items-center justify-between px-4 py-3 text-white"
+          >
             <div className="flex items-center gap-2">
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
                 <ChatIcon />
               </span>
               <div className="leading-tight">
-                <div className="text-sm font-semibold">{UI.title[l]}</div>
-                <div className="flex items-center gap-1 text-xs text-emerald-100">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-300" />
+                <div className="text-sm font-semibold">{biz.title[l]}</div>
+                <div className="flex items-center gap-1 text-xs text-white/80">
+                  <span className="h-1.5 w-1.5 rounded-full bg-white/80" />
                   {UI.online[l]}
                 </div>
               </div>
@@ -114,7 +127,9 @@ export default function ChatWidget() {
           <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto bg-zinc-50 p-4 dark:bg-zinc-950">
             {lang === null ? (
               <div className="space-y-3">
-                <Bubble from="bot">Alege limba · Выберите язык</Bubble>
+                <Bubble from="bot" accent={accent}>
+                  Alege limba · Выберите язык
+                </Bubble>
                 <div className="flex gap-2">
                   <PickBtn onClick={() => pickLanguage("ro")}>🇷🇴 Română</PickBtn>
                   <PickBtn onClick={() => pickLanguage("ru")}>🇷🇺 Русский</PickBtn>
@@ -122,7 +137,7 @@ export default function ChatWidget() {
               </div>
             ) : (
               messages.map((m, i) => (
-                <Bubble key={i} from={m.from}>
+                <Bubble key={i} from={m.from} accent={accent}>
                   {m.text}
                 </Bubble>
               ))
@@ -159,18 +174,19 @@ export default function ChatWidget() {
                   onChange={(e) => setInput(e.target.value)}
                   placeholder={l === "ru" ? "Напишите сообщение…" : "Scrie un mesaj…"}
                   disabled={loading}
-                  className="min-w-0 flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
+                  className="min-w-0 flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-400 disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                 />
                 <button
                   type="submit"
                   disabled={loading}
-                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
+                  style={{ backgroundColor: accent }}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-white hover:brightness-95 disabled:opacity-60"
                 >
                   {UI.send[l]}
                 </button>
               </form>
             ) : (
-              <p className="py-2 text-center text-xs text-zinc-400">{UI.title[l]}</p>
+              <p className="py-2 text-center text-xs text-zinc-400">{biz.title[l]}</p>
             )}
           </div>
         </div>
@@ -179,16 +195,25 @@ export default function ChatWidget() {
   );
 }
 
-function Bubble({ from, children }: { from: "bot" | "user"; children: React.ReactNode }) {
+function Bubble({
+  from,
+  accent,
+  children,
+}: {
+  from: "bot" | "user";
+  accent: string;
+  children: React.ReactNode;
+}) {
   const isBot = from === "bot";
   return (
     <div className={isBot ? "flex justify-start" : "flex justify-end"}>
       <div
+        style={isBot ? undefined : { backgroundColor: accent }}
         className={
           "max-w-[85%] whitespace-pre-line rounded-2xl px-3 py-2 text-sm " +
           (isBot
             ? "rounded-bl-sm bg-white text-zinc-800 shadow-sm dark:bg-zinc-800 dark:text-zinc-100"
-            : "rounded-br-sm bg-emerald-600 text-white")
+            : "rounded-br-sm text-white")
         }
       >
         {children}
@@ -201,7 +226,7 @@ function PickBtn({ children, onClick }: { children: React.ReactNode; onClick: ()
   return (
     <button
       onClick={onClick}
-      className="rounded-full border border-emerald-300 bg-white px-3 py-1.5 text-sm font-medium text-emerald-700 transition hover:bg-emerald-50 dark:border-emerald-700 dark:bg-zinc-800 dark:text-emerald-300"
+      className="rounded-full border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-zinc-700 transition hover:bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
     >
       {children}
     </button>

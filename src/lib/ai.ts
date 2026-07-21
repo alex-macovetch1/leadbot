@@ -22,9 +22,6 @@ export async function chatComplete(system: string, messages: ChatMsg[]): Promise
     generationConfig: {
       temperature: 0.6,
       maxOutputTokens: 1024,
-      // Gemini 3 Flash "thinks" by default, which eats the output budget and can
-      // truncate the reply before the LEAD_JSON marker. Turn it off for this task.
-      thinkingConfig: { thinkingBudget: 0 },
     },
   };
 

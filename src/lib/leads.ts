@@ -63,3 +63,71 @@ export async function getLeads(): Promise<StoredLead[]> {
     createdAt: Number(r.created_at),
   }));
 }
+
+/* ------------------------------------------------------------------
+   Generic, per-business demo leads. One table (demo_leads) serves any
+   business the bot is branded for. Best-effort: never throws, so a chat
+   demo keeps working even if the table is missing — it just falls back
+   to in-memory for that serverless instance.
+------------------------------------------------------------------ */
+
+export type DemoLead = {
+  id: string;
+  biz: string;
+  lang: string;
+  name: string;
+  phone: string;
+  details: string;
+  createdAt: number;
+};
+
+const demoMemory: DemoLead[] = [];
+
+export async function saveDemoLead(input: {
+  biz: string;
+  lang: string;
+  name: string;
+  phone: string;
+  details: string;
+}): Promise<void> {
+  const entry: DemoLead = { ...input, id: `lead_${Date.now()}_${counter++}`, createdAt: Date.now() };
+  const db = sb();
+  try {
+    if (db) {
+      await db.from("demo_leads").insert({
+        id: entry.id,
+        biz: entry.biz,
+        lang: entry.lang,
+        name: entry.name,
+        phone: entry.phone,
+        details: entry.details,
+        created_at: entry.createdAt,
+      });
+    } else {
+      demoMemory.unshift(entry);
+    }
+  } catch {
+    demoMemory.unshift(entry);
+  }
+}
+
+export async function getDemoLeads(biz?: string): Promise<DemoLead[]> {
+  const db = sb();
+  if (!db) return biz ? demoMemory.filter((l) => l.biz === biz) : demoMemory;
+  try {
+    let q = db.from("demo_leads").select("*").order("created_at", { ascending: false });
+    if (biz) q = q.eq("biz", biz);
+    const { data } = await q;
+    return (data ?? []).map((r: any) => ({
+      id: r.id,
+      biz: r.biz,
+      lang: r.lang,
+      name: r.name,
+      phone: r.phone,
+      details: r.details,
+      createdAt: Number(r.created_at),
+    }));
+  } catch {
+    return demoMemory;
+  }
+}
