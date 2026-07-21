@@ -9,7 +9,7 @@
 
 export type ChatMsg = { role: "user" | "model"; text: string };
 
-const MODEL = process.env.GEMINI_MODEL || "gemini-2.5-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 
 export async function chatComplete(system: string, messages: ChatMsg[]): Promise<string> {
   const key = process.env.GEMINI_API_KEY;
