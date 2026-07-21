@@ -71,7 +71,12 @@ export default function ChatWidget() {
       `• ${finalLead.name}, ${finalLead.phone}`,
     ].join("\n");
     setMessages((m) => [...m, { from: "bot", text: summary }, { from: "bot", text: UI.thanks[l] }]);
-    // Day 2: POST finalLead to /api/leads here.
+    // send the captured lead to the backend (fire-and-forget; the UX never blocks on it)
+    fetch("/api/leads", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(finalLead),
+    }).catch(() => {});
   }
 
   function choose(value: string, label: string) {
