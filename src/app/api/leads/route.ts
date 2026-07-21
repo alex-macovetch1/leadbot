@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "A name and a valid phone are required" }, { status: 400 });
   }
 
-  const lead = saveLead({
+  const lead = await saveLead({
     lang: body.lang ?? "ro",
     deal: body.deal ?? "",
     propertyType: body.propertyType ?? "",
@@ -34,5 +34,5 @@ export async function GET(request: Request) {
   if (key !== (process.env.ADMIN_KEY || "demo")) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
-  return NextResponse.json({ leads: getLeads() });
+  return NextResponse.json({ leads: await getLeads() });
 }

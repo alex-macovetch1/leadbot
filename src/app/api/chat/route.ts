@@ -27,7 +27,7 @@ export async function POST(request: Request) {
   if (match) {
     try {
       const data = JSON.parse(match[1]);
-      saveLead({
+      await saveLead({
         lang: data.lang ?? "ro",
         deal: data.deal ?? "",
         propertyType: data.propertyType ?? "",

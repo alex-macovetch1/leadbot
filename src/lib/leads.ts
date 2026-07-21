@@ -1,29 +1,65 @@
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { Lead } from "./flow";
 
 /* ------------------------------------------------------------------
-   Lead storage.
+   Lead storage — Supabase (Postgres).
 
-   In-memory for now — it works in a running server (local dev) but
-   resets on restart / serverless cold start. This module is the single
-   place to swap for a real database: replace the array with Supabase /
-   Postgres queries and the API route + admin page keep working unchanged.
+   Persists across restarts and deploys, and works on serverless.
+   Needs SUPABASE_URL and SUPABASE_SERVICE_KEY in the environment.
+   Falls back to in-memory only when those are not set (local demo).
 ------------------------------------------------------------------ */
+
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 export type StoredLead = Lead & { id: string; createdAt: number };
 
-const store: StoredLead[] = [];
+// --- in-memory fallback (used only when Supabase env is absent) ---
+const memory: StoredLead[] = [];
 let counter = 0;
 
-export function saveLead(lead: Lead): StoredLead {
-  const entry: StoredLead = {
-    ...lead,
-    id: `lead_${Date.now()}_${counter++}`,
-    createdAt: Date.now(),
-  };
-  store.unshift(entry);
+let _sb: SupabaseClient | null = null;
+function sb(): SupabaseClient | null {
+  const url = process.env.SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_KEY;
+  if (!url || !key) return null;
+  if (!_sb) _sb = createClient(url, key, { auth: { persistSession: false } });
+  return _sb;
+}
+
+export async function saveLead(lead: Lead): Promise<StoredLead> {
+  const entry: StoredLead = { ...lead, id: `lead_${Date.now()}_${counter++}`, createdAt: Date.now() };
+  const db = sb();
+  if (db) {
+    await db.from("leads").insert({
+      id: entry.id,
+      lang: entry.lang,
+      deal: entry.deal,
+      property_type: entry.propertyType,
+      zone: entry.zone,
+      budget: entry.budget,
+      name: entry.name,
+      phone: entry.phone,
+      created_at: entry.createdAt,
+    });
+  } else {
+    memory.unshift(entry);
+  }
   return entry;
 }
 
-export function getLeads(): StoredLead[] {
-  return store;
+export async function getLeads(): Promise<StoredLead[]> {
+  const db = sb();
+  if (!db) return memory;
+  const { data } = await db.from("leads").select("*").order("created_at", { ascending: false });
+  return (data ?? []).map((r: any) => ({
+    id: r.id,
+    lang: r.lang,
+    deal: r.deal,
+    propertyType: r.property_type,
+    zone: r.zone,
+    budget: r.budget,
+    name: r.name,
+    phone: r.phone,
+    createdAt: Number(r.created_at),
+  }));
 }
