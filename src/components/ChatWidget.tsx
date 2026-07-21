@@ -1,123 +1,83 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import {
-  GREETING,
-  STEPS,
-  UI,
-  isValidPhone,
-  labelFor,
-  type Lang,
-  type Lead,
-} from "@/lib/flow";
+import { GREETING, UI, type Lang } from "@/lib/flow";
+import type { ChatMsg } from "@/lib/ai";
 
 type Msg = { from: "bot" | "user"; text: string };
-
-const EMPTY_LEAD: Lead = {
-  lang: "ro",
-  deal: "",
-  propertyType: "",
-  zone: "",
-  budget: "",
-  name: "",
-  phone: "",
-};
 
 export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [lang, setLang] = useState<Lang | null>(null);
-  const [stepIdx, setStepIdx] = useState(0);
-  const [messages, setMessages] = useState<Msg[]>([]);
+  const [messages, setMessages] = useState<Msg[]>([]); // display
+  const [convo, setConvo] = useState<ChatMsg[]>([]); // history sent to the AI (no greeting)
   const [input, setInput] = useState("");
-  const [lead, setLead] = useState<Lead>(EMPTY_LEAD);
+  const [loading, setLoading] = useState(false);
   const [done, setDone] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const step = lang !== null && stepIdx < STEPS.length ? STEPS[stepIdx] : null;
-
-  // auto-scroll to newest message
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
-  }, [messages, done]);
+  }, [messages, loading]);
 
   function pickLanguage(l: Lang) {
     setLang(l);
-    setLead({ ...EMPTY_LEAD, lang: l });
-    setMessages([
-      { from: "bot", text: GREETING[l] },
-      { from: "bot", text: STEPS[0].prompt[l] },
-    ]);
+    setMessages([{ from: "bot", text: GREETING[l] }]);
   }
 
-  function advance(nextLead: Lead) {
-    const next = stepIdx + 1;
-    setStepIdx(next);
-    if (next < STEPS.length) {
-      setMessages((m) => [...m, { from: "bot", text: STEPS[next].prompt[nextLead.lang] }]);
-    } else {
-      finish(nextLead);
-    }
-  }
+  async function send() {
+    const text = input.trim();
+    if (!text || loading || done) return;
+    const l = lang ?? "ro";
 
-  function finish(finalLead: Lead) {
-    setDone(true);
-    const l = finalLead.lang;
-    const summary = [
-      UI.summaryTitle[l],
-      `• ${labelFor("deal", finalLead.deal, l)} — ${labelFor("propertyType", finalLead.propertyType, l)}`,
-      `• ${finalLead.zone}`,
-      `• ${labelFor("budget", finalLead.budget, l)} €`,
-      `• ${finalLead.name}, ${finalLead.phone}`,
-    ].join("\n");
-    setMessages((m) => [...m, { from: "bot", text: summary }, { from: "bot", text: UI.thanks[l] }]);
-    // send the captured lead to the backend (fire-and-forget; the UX never blocks on it)
-    fetch("/api/leads", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(finalLead),
-    }).catch(() => {});
-  }
-
-  function choose(value: string, label: string) {
-    if (!step || !step.field) return;
-    const nextLead = { ...lead, [step.field]: value } as Lead;
-    setLead(nextLead);
-    setMessages((m) => [...m, { from: "user", text: label }]);
-    advance(nextLead);
-  }
-
-  function submitText() {
-    if (!step || !step.field) return;
-    const value = input.trim();
-    if (!value) return;
-    if (step.kind === "phone" && !isValidPhone(value)) {
-      setError(UI.phoneError[lead.lang]);
-      return;
-    }
-    setError(null);
-    const nextLead = { ...lead, [step.field]: value } as Lead;
-    setLead(nextLead);
-    setMessages((m) => [...m, { from: "user", text: value }]);
+    const nextConvo: ChatMsg[] = [...convo, { role: "user", text }];
+    setMessages((m) => [...m, { from: "user", text }]);
+    setConvo(nextConvo);
     setInput("");
-    advance(nextLead);
+    setLoading(true);
+
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: nextConvo }),
+      });
+      const data = await res.json();
+      if (!res.ok || data.error) throw new Error(data.error || "error");
+
+      const reply: string = data.reply || "…";
+      setMessages((m) => [...m, { from: "bot", text: reply }]);
+      setConvo([...nextConvo, { role: "model", text: reply }]);
+      if (data.done) setDone(true);
+    } catch {
+      setMessages((m) => [
+        ...m,
+        {
+          from: "bot",
+          text:
+            l === "ru"
+              ? "Извините, что-то пошло не так. Попробуйте ещё раз."
+              : "Scuze, ceva n-a mers. Mai încearcă o dată.",
+        },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function restart() {
     setLang(null);
-    setStepIdx(0);
     setMessages([]);
+    setConvo([]);
     setInput("");
-    setLead(EMPTY_LEAD);
+    setLoading(false);
     setDone(false);
-    setError(null);
   }
 
   const l = lang ?? "ro";
 
   return (
     <>
-      {/* Launcher bubble */}
       {!open && (
         <button
           onClick={() => setOpen(true)}
@@ -129,10 +89,9 @@ export default function ChatWidget() {
         </button>
       )}
 
-      {/* Panel */}
       {open && (
         <div className="fixed bottom-5 right-5 z-50 flex h-[560px] w-[min(92vw,380px)] flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-2xl dark:border-zinc-800 dark:bg-zinc-900">
-          {/* Header */}
+          {/* header */}
           <div className="flex items-center justify-between bg-emerald-600 px-4 py-3 text-white">
             <div className="flex items-center gap-2">
               <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white/20">
@@ -151,14 +110,11 @@ export default function ChatWidget() {
             </button>
           </div>
 
-          {/* Messages */}
+          {/* messages */}
           <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto bg-zinc-50 p-4 dark:bg-zinc-950">
-            {/* language picker first */}
             {lang === null ? (
               <div className="space-y-3">
-                <Bubble from="bot">
-                  Alege limba · Выберите язык
-                </Bubble>
+                <Bubble from="bot">Alege limba · Выберите язык</Bubble>
                 <div className="flex gap-2">
                   <PickBtn onClick={() => pickLanguage("ro")}>🇷🇴 Română</PickBtn>
                   <PickBtn onClick={() => pickLanguage("ru")}>🇷🇺 Русский</PickBtn>
@@ -171,22 +127,16 @@ export default function ChatWidget() {
                 </Bubble>
               ))
             )}
-
-            {/* choice options for the current step */}
-            {step && step.kind === "choice" && !done && (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {step.options!.map((o) => (
-                  <PickBtn key={o.value} onClick={() => choose(o.value, o.label[l])}>
-                    {o.label[l]}
-                  </PickBtn>
-                ))}
+            {loading && (
+              <div className="flex justify-start">
+                <div className="rounded-2xl rounded-bl-sm bg-white px-3 py-2 shadow-sm dark:bg-zinc-800">
+                  <span className="typing-dots text-zinc-400">•••</span>
+                </div>
               </div>
             )}
-
-            {error && <p className="text-sm text-red-500">{error}</p>}
           </div>
 
-          {/* Footer input */}
+          {/* footer */}
           <div className="border-t border-zinc-200 bg-white p-2 dark:border-zinc-800 dark:bg-zinc-900">
             {done ? (
               <button
@@ -195,11 +145,11 @@ export default function ChatWidget() {
               >
                 {UI.restart[l]}
               </button>
-            ) : step && (step.kind === "text" || step.kind === "phone") ? (
+            ) : lang !== null ? (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  submitText();
+                  send();
                 }}
                 className="flex gap-2"
               >
@@ -207,21 +157,20 @@ export default function ChatWidget() {
                   autoFocus
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={step.placeholder?.[l] ?? ""}
-                  className="min-w-0 flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
-                  inputMode={step.kind === "phone" ? "tel" : "text"}
+                  placeholder={l === "ru" ? "Напишите сообщение…" : "Scrie un mesaj…"}
+                  disabled={loading}
+                  className="min-w-0 flex-1 rounded-lg border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-emerald-500 disabled:opacity-60 dark:border-zinc-700 dark:bg-zinc-800 dark:text-white"
                 />
                 <button
                   type="submit"
-                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700"
+                  disabled={loading}
+                  className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-60"
                 >
                   {UI.send[l]}
                 </button>
               </form>
             ) : (
-              <p className="py-2 text-center text-xs text-zinc-400">
-                {lang === null ? "" : UI.title[l]}
-              </p>
+              <p className="py-2 text-center text-xs text-zinc-400">{UI.title[l]}</p>
             )}
           </div>
         </div>
