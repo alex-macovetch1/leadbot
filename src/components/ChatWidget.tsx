@@ -4,8 +4,9 @@ import { useEffect, useRef, useState } from "react";
 import { UI, type Lang } from "@/lib/flow";
 import type { Bilingual } from "@/lib/businesses";
 import type { ChatMsg } from "@/lib/ai";
+import type { Listing } from "@/lib/listings";
 
-type Msg = { from: "bot" | "user"; text: string };
+type Msg = { from: "bot" | "user"; text: string; cards?: Listing[] };
 
 export type WidgetBiz = {
   slug: string;
@@ -55,7 +56,7 @@ export default function ChatWidget({ biz }: { biz: WidgetBiz }) {
       if (!res.ok || data.error) throw new Error(data.error || "error");
 
       const reply: string = data.reply || "…";
-      setMessages((m) => [...m, { from: "bot", text: reply }]);
+      setMessages((m) => [...m, { from: "bot", text: reply, cards: data.matches }]);
       setConvo([...nextConvo, { role: "model", text: reply }]);
       if (data.done) setDone(true);
     } catch {
@@ -137,9 +138,20 @@ export default function ChatWidget({ biz }: { biz: WidgetBiz }) {
               </div>
             ) : (
               messages.map((m, i) => (
-                <Bubble key={i} from={m.from} accent={accent}>
-                  {m.text}
-                </Bubble>
+                <div key={i} className="space-y-2">
+                  {m.text && (
+                    <Bubble from={m.from} accent={accent}>
+                      {m.text}
+                    </Bubble>
+                  )}
+                  {m.cards && m.cards.length > 0 && (
+                    <div className="space-y-2">
+                      {m.cards.map((c) => (
+                        <ListingCard key={c.id} listing={c} lang={l} accent={accent} />
+                      ))}
+                    </div>
+                  )}
+                </div>
               ))
             )}
             {loading && (
@@ -230,6 +242,32 @@ function PickBtn({ children, onClick }: { children: React.ReactNode; onClick: ()
     >
       {children}
     </button>
+  );
+}
+
+function ListingCard({ listing, lang, accent }: { listing: Listing; lang: Lang; accent: string }) {
+  const rooms = lang === "ru" ? "комн." : "cam.";
+  const price =
+    listing.deal === "rent"
+      ? `€${listing.price}/${lang === "ru" ? "мес" : "lună"}`
+      : `€${listing.price.toLocaleString("de-DE")}`;
+  return (
+    <div className="max-w-[90%] rounded-xl border border-zinc-200 bg-white p-3 shadow-sm dark:border-zinc-700 dark:bg-zinc-800">
+      <div className="flex items-start justify-between gap-2">
+        <div className="text-sm font-semibold text-zinc-800 dark:text-zinc-100">{listing.title[lang]}</div>
+        <div style={{ color: accent }} className="whitespace-nowrap text-sm font-bold">
+          {price}
+        </div>
+      </div>
+      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+        <span>{listing.zoneLabel}</span>
+        <span>
+          {listing.rooms} {rooms}
+        </span>
+        <span>{listing.area} m²</span>
+        <span>et. {listing.floor}</span>
+      </div>
+    </div>
   );
 }
 

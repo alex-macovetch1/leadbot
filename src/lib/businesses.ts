@@ -19,6 +19,7 @@ export type Business = {
   aiRole: string;               // who the assistant is
   aiInfo: string;               // services / hours / facts it may use
   aiCollect: string;            // what it should find out from the visitor
+  search?: boolean;             // real-estate: qualify the visitor, then search the listings
 };
 
 const REALESTATE: Business = {
@@ -42,6 +43,7 @@ const REALESTATE: Business = {
   aiRole: "a friendly assistant for a real-estate agency in Moldova",
   aiInfo: "The agency handles buying, renting and selling apartments, houses, commercial spaces and land across Moldova.",
   aiCollect: "whether they want to buy/rent/sell, the property type, the city or district, and an approximate budget in euros",
+  search: true,
 };
 
 const DENTAL: Business = {
