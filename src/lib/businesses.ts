@@ -5,6 +5,7 @@
 // the demo URL is  /?b=<slug>.
 
 export type Bilingual = { ro: string; ru: string };
+export type BilingualList = { ro: string[]; ru: string[] };
 
 export type Business = {
   slug: string;
@@ -14,6 +15,8 @@ export type Business = {
   heroSub: Bilingual;
   widgetTitle: Bilingual;       // chat header
   greeting: Bilingual;          // first bot message
+  suggestions: BilingualList;   // starter prompts shown as chips under the greeting
+  proof: Bilingual[];           // short trust points shown under the hero
   accent: string;               // brand color (hex)
   // --- AI (English; drives the system prompt) ---
   aiRole: string;               // who the assistant is
@@ -39,6 +42,15 @@ const REALESTATE: Business = {
     ro: "Bună! 👋 Te ajut să găsești imobilul potrivit. Îți pun câteva întrebări scurte.",
     ru: "Здравствуйте! 👋 Помогу подобрать недвижимость. Задам пару коротких вопросов.",
   },
+  suggestions: {
+    ro: ["Caut apartament cu 2 camere", "Vreau să închiriez", "Ce aveți în Botanica?"],
+    ru: ["Ищу 2-комнатную квартиру", "Хочу арендовать", "Что есть на Ботанике?"],
+  },
+  proof: [
+    { ro: "Caută în ofertă live", ru: "Ищет по базе объектов" },
+    { ro: "Califică cererea", ru: "Квалифицирует запрос" },
+    { ro: "Salvează lead-ul", ru: "Сохраняет лид" },
+  ],
   accent: "#059669",
   aiRole: "a friendly assistant for a real-estate agency in Moldova",
   aiInfo: "The agency handles buying, renting and selling apartments, houses, commercial spaces and land across Moldova.",
@@ -63,6 +75,15 @@ const DENTAL: Business = {
     ro: "Bună ziua! 👋 Vă pot ajuta cu o programare sau întrebări despre servicii. Cu ce vă pot fi de folos?",
     ru: "Здравствуйте! 👋 Помогу записаться или отвечу на вопросы об услугах. Чем могу помочь?",
   },
+  suggestions: {
+    ro: ["Vreau o programare", "Cât costă un implant?", "Lucrați sâmbăta?"],
+    ru: ["Хочу записаться", "Сколько стоит имплант?", "Работаете в субботу?"],
+  },
+  proof: [
+    { ro: "Preia programări", ru: "Принимает записи" },
+    { ro: "Răspunde la întrebări", ru: "Отвечает на вопросы" },
+    { ro: "Salvează contactul", ru: "Сохраняет контакт" },
+  ],
   accent: "#0ea5e9",
   aiRole: "a warm, professional reception assistant for a dental clinic in Chișinău",
   aiInfo:
@@ -88,6 +109,15 @@ const RESTAURANT: Business = {
     ro: "Bună! 👋 Doriți o rezervare sau aveți o întrebare despre meniu ori program? Vă ajut cu drag.",
     ru: "Здравствуйте! 👋 Хотите забронировать столик или узнать о меню и часах? С радостью помогу.",
   },
+  suggestions: {
+    ro: ["Vreau o rezervare", "Aveți meniu pentru copii?", "Care e programul?"],
+    ru: ["Хочу забронировать столик", "Есть детское меню?", "Какие часы работы?"],
+  },
+  proof: [
+    { ro: "Preia rezervări", ru: "Принимает брони" },
+    { ro: "Răspunde despre meniu", ru: "Отвечает о меню" },
+    { ro: "Salvează contactul", ru: "Сохраняет контакт" },
+  ],
   accent: "#d97706",
   aiRole: "a friendly host assistant for a restaurant in Chișinău",
   aiInfo:
@@ -112,6 +142,15 @@ const ALEXWEB: Business = {
     ro: "Bună! 👋 Sunt asistentul lui Alexandru. Vă pot spune cum vă facem un site sau un chatbot AI ca acesta. Cu ce afacere lucrați?",
     ru: "Здравствуйте! 👋 Я ассистент Александра. Расскажу, как сделать вам сайт или AI-бота, как этот. Какой у вас бизнес?",
   },
+  suggestions: {
+    ro: ["Vreau un site pentru afacerea mea", "Cât costă un bot ca acesta?", "În cât timp e gata?"],
+    ru: ["Хочу сайт для бизнеса", "Сколько стоит такой бот?", "Как быстро будет готово?"],
+  },
+  proof: [
+    { ro: "Site-uri la preț fix", ru: "Сайты по фикс. цене" },
+    { ro: "Boți AI bilingvi", ru: "Двуязычные AI-боты" },
+    { ro: "Gata în ~5 zile", ru: "Готово за ~5 дней" },
+  ],
   accent: "#7c3aed",
   aiRole:
     "a friendly assistant for Alexandru Macovetchi, a web developer in Moldova who builds modern websites and installs AI chat assistants for local businesses",
