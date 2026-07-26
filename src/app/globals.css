@@ -83,7 +83,196 @@ body {
   border-radius: 999px;
 }
 
-/* ---------- chat panel ---------- */
+/* ---------- chat panel ----------
+   Scoped to .chat-shell so nothing here can leak into the dark landing
+   page, which owns .card / .chip with different meanings.               */
+
+.chat-shell {
+  --a: #0ea5e9;
+  background: #fff;
+  color: #0f172a;
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.05),
+    0 24px 60px -22px rgba(15, 23, 42, 0.32);
+}
+
+.chat-shell .chat-bg {
+  background:
+    radial-gradient(28rem 16rem at 50% -10%, color-mix(in oklab, var(--a) 12%, transparent), transparent 70%),
+    #fbfbfa;
+}
+
+/* avatar */
+.chat-shell .avatar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(150deg, var(--a), color-mix(in oklab, var(--a) 62%, #000));
+  box-shadow: 0 4px 12px -3px color-mix(in oklab, var(--a) 55%, transparent);
+}
+.chat-shell .avatar-sm {
+  width: 30px;
+  height: 30px;
+  margin-bottom: 1px;
+}
+.chat-shell .avatar .ring {
+  position: absolute;
+  inset: -3px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in oklab, var(--a) 32%, transparent);
+}
+
+/* header buttons */
+.chat-shell .icon-btn {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  color: #94a3b8;
+  transition: background-color 0.22s, color 0.22s;
+}
+.chat-shell .icon-btn:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* bubbles */
+.chat-shell .bubble {
+  max-width: 78%;
+  padding: 9px 14px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  white-space: pre-line;
+  border-radius: 18px;
+}
+.chat-shell .bubble-bot {
+  background: #fff;
+  color: #334155;
+  border-bottom-left-radius: 6px;
+  box-shadow:
+    0 1px 1px rgba(15, 23, 42, 0.04),
+    0 6px 16px -8px rgba(15, 23, 42, 0.18);
+}
+.chat-shell .bubble-me {
+  background: var(--a);
+  color: #fff;
+  border-bottom-right-radius: 6px;
+  box-shadow: 0 6px 16px -8px color-mix(in oklab, var(--a) 75%, transparent);
+}
+
+/* suggestion chips */
+.chat-shell .q-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px;
+  font-size: 12.5px;
+  font-weight: 500;
+  text-align: left;
+  color: color-mix(in oklab, var(--a) 78%, #0f172a);
+  background: #fff;
+  border: 1px solid color-mix(in oklab, var(--a) 22%, #e2e8f0);
+  border-radius: 999px;
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.22s, box-shadow 0.22s;
+}
+.chat-shell .q-chip:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--a) 55%, transparent);
+  box-shadow: 0 6px 16px -8px color-mix(in oklab, var(--a) 60%, transparent);
+}
+.chat-shell .q-chip-arrow {
+  opacity: 0.35;
+  transition: transform 0.22s, opacity 0.22s;
+}
+.chat-shell .q-chip:hover .q-chip-arrow {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+/* composer */
+.chat-shell .composer {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 4px 4px 0;
+  background: #f4f4f2;
+  border: 1px solid #e6e6e2;
+  border-radius: 999px;
+  transition: border-color 0.22s, background-color 0.22s;
+}
+.chat-shell .composer:focus-within {
+  background: #fff;
+  border-color: color-mix(in oklab, var(--a) 45%, transparent);
+}
+.chat-shell .send-btn {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--a);
+  transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s;
+}
+.chat-shell .send-btn:hover:not(:disabled) {
+  transform: scale(1.06);
+}
+.chat-shell .send-btn:disabled {
+  opacity: 0.32;
+}
+.chat-shell .restart-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #334155;
+  background: #f1f5f9;
+  border-radius: 999px;
+  transition: background-color 0.22s;
+}
+.chat-shell .restart-btn:hover {
+  background: #e2e8f0;
+}
+
+/* listing card */
+.chat-shell .listing {
+  padding: 12px 13px;
+  background: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 14px;
+  box-shadow: 0 6px 16px -10px rgba(15, 23, 42, 0.2);
+  transition: border-color 0.22s, transform 0.22s;
+}
+.chat-shell .listing:hover {
+  transform: translateY(-1px);
+  border-color: color-mix(in oklab, var(--a) 35%, #eaeaea);
+}
+
+@keyframes chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.chip-in {
+  animation: chip-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
 
 .panel-glow {
   box-shadow:
@@ -189,8 +378,12 @@ body {
   .msg-in,
   .rise,
   .typing i,
-  .live-dot {
+  .live-dot,
+  .chip-in {
     animation: none !important;
+  }
+  .chat-shell * {
+    transition-duration: 0.001ms !important;
   }
   html {
     scroll-behavior: auto;

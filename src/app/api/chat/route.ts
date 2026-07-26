@@ -3,6 +3,7 @@ import { chatComplete, type ChatMsg } from "@/lib/ai";
 import { buildSystemPrompt } from "@/lib/prompt";
 import { getBusiness } from "@/lib/businesses";
 import { saveDemoLead } from "@/lib/leads";
+import { notifyLead } from "@/lib/notify";
 import { searchListings, type Listing } from "@/lib/listings";
 
 // The widget is embedded on other domains (the portfolio and clients' sites),
@@ -61,13 +62,16 @@ export async function POST(request: Request) {
   if (match) {
     try {
       const data = JSON.parse(match[1]);
-      await saveDemoLead({
+      const lead = {
         biz: biz.slug,
         lang: data.lang ?? "ro",
         name: data.name ?? "",
         phone: data.phone ?? "",
         details: data.details ?? "",
-      });
+      };
+      // Store first: the lead must survive even if the notification fails.
+      await saveDemoLead(lead);
+      await notifyLead({ ...lead, bizTitle: biz.name });
       done = true;
     } catch {
       /* malformed marker — don't save, but keep the chat working */
