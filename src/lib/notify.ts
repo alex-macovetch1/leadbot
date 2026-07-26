@@ -16,7 +16,7 @@ export type LeadNotice = {
 };
 
 const FROM = process.env.LEAD_EMAIL_FROM || "onboarding@resend.dev";
-const TO = process.env.LEAD_EMAIL_TO || "alexmacovetchi23@gmail.com";
+const TO = process.env.LEAD_EMAIL_TO || "alex.shido.it@gmail.com";
 
 /** Strip characters a phone number never contains, then build a wa.me link. */
 function waLink(phone: string): string | null {
