@@ -78,15 +78,57 @@ function body(lead: LeadNotice, when: string): string {
   </body></html>`;
 }
 
+/* Telegram: instant, free, and it buzzes the phone. Optional — set
+   TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID to switch it on. */
+async function notifyTelegram(lead: LeadNotice, when: string): Promise<void> {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chat = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chat) return;
+
+  const link = waLink(lead.phone);
+  const text = [
+    "🔔 *Lead nou*",
+    "",
+    `*${lead.name || "Fără nume"}*`,
+    `📞 \`${lead.phone}\``,
+    lead.details ? `💬 ${lead.details}` : "",
+    "",
+    `_${lead.bizTitle} · ${lead.lang === "ru" ? "rusă" : "română"} · ${when}_`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: chat,
+        text,
+        parse_mode: "Markdown",
+        reply_markup: link
+          ? { inline_keyboard: [[{ text: "Răspunde pe WhatsApp", url: link }]] }
+          : undefined,
+      }),
+    });
+  } catch (err) {
+    console.error("notifyTelegram a eșuat:", err);
+  }
+}
+
 export async function notifyLead(lead: LeadNotice): Promise<void> {
+  if (!NOTIFY_FOR.includes(lead.biz)) return;
   const key = process.env.RESEND_API_KEY;
-  if (!key || !NOTIFY_FOR.includes(lead.biz)) return;
 
   const when = new Intl.DateTimeFormat("ro-MD", {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: "Europe/Chisinau",
   }).format(new Date());
+
+  // Telegram first — it is the one that actually reaches him in seconds.
+  await notifyTelegram(lead, when);
+  if (!key) return;
 
   try {
     const res = await fetch("https://api.resend.com/emails", {
