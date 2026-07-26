@@ -1,7 +1,10 @@
 import type { CSSProperties } from "react";
+import Link from "next/link";
 import ChatPanel from "@/components/ChatPanel";
 import ChatWidget from "@/components/ChatWidget";
-import { getBusiness } from "@/lib/businesses";
+import { getBusiness, BUSINESSES } from "@/lib/businesses";
+
+const DEMOS = ["dental", "imobiliar", "restaurant"] as const;
 
 export default async function Home({
   searchParams,
@@ -10,7 +13,6 @@ export default async function Home({
 }) {
   const { b } = await searchParams;
   const biz = getBusiness(b);
-  const accent = biz.accent;
 
   const widgetBiz = {
     slug: biz.slug,
@@ -21,287 +23,301 @@ export default async function Home({
   };
 
   return (
-    <div style={{ "--accent": accent } as CSSProperties} className="relative min-h-screen">
-      {/* ambient background */}
-      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-        <div className="aura absolute inset-0" />
-        <div className="grid-lines absolute inset-0" />
+    <div style={{ "--a": biz.accent } as CSSProperties} className="lb">
+      {/* ── nav ── */}
+      <div className="lb-navshell">
+        <nav className="lb-nav">
+          <span className="lb-brand">
+            <i />
+            <b>{biz.name}</b>
+          </span>
+
+          <div className="lb-switch" role="group" aria-label="Alege demonstrația">
+            {DEMOS.map((slug) => {
+              const d = BUSINESSES[slug];
+              return (
+                <Link
+                  key={slug}
+                  href={`/?b=${slug}`}
+                  aria-current={slug === biz.slug ? "true" : undefined}
+                  style={{ "--s": d.accent } as CSSProperties}
+                >
+                  <i />
+                  {d.category.ro.split(" ·")[0]}
+                </Link>
+              );
+            })}
+          </div>
+
+          <a href="#pret" className="lb-btn lb-btn-dark">
+            Vreau unul
+          </a>
+        </nav>
       </div>
 
-      {/* header */}
-      <header className="sticky top-0 z-40 border-b border-white/5 bg-[#070910]/70 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-5 py-3.5">
-          <div className="flex min-w-0 items-center gap-2.5">
-            <span
-              style={{ background: `linear-gradient(135deg, ${accent}, color-mix(in oklab, ${accent} 60%, #000))` }}
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-[15px] font-bold text-white shadow-lg"
-            >
-              {biz.name.charAt(0)}
+      {/* ── hero ── */}
+      <header className="lb-wrap lb-hero" id="top">
+        <div className="lb-hero-grid">
+          <div>
+            <span className="lb-badge">
+              <span className="lb-dot" />
+              Demonstrație live · scrie-i chiar acum
             </span>
-            <span className="truncate text-[15px] font-semibold tracking-tight">{biz.name}</span>
+            <h1 className="lb-h1">{biz.heroTitle.ro}</h1>
+            <p className="lb-lede">{biz.heroSub.ro}</p>
+            <ul className="lb-proof">
+              {biz.proof.map((p) => (
+                <li key={p.ro}>
+                  <Check />
+                  {p.ro}
+                </li>
+              ))}
+            </ul>
           </div>
-          <span className="chip hidden shrink-0 px-3 py-1.5 text-xs font-medium text-[color:var(--muted)] sm:block">
-            {biz.category.ro}
-          </span>
+
+          <div className="lb-panel-wrap">
+            <ChatPanel biz={widgetBiz} className="h-[540px] w-full" />
+          </div>
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-5">
-        {/* hero */}
-        <section className="grid items-center gap-10 py-12 lg:grid-cols-[1.05fr_400px] lg:gap-14 lg:py-20">
-          <div className="rise">
-            <span className="chip inline-flex items-center gap-2 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider">
-              <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-400" />
-              <span className="accent-text">Demo live · funcționează acum</span>
-            </span>
-
-            <h1 className="gradient-text mt-5 text-[2.1rem] font-bold leading-[1.08] tracking-tight sm:text-5xl lg:text-[3.4rem]">
-              {biz.heroTitle.ro}
-            </h1>
-
-            <p className="mt-5 max-w-xl text-[15px] leading-relaxed text-[color:var(--muted)] sm:text-lg">
-              {biz.heroSub.ro}
+      {/* ── the payoff: what the owner receives ── */}
+      <section className="lb-band">
+        <div className="lb-wrap lb-band-grid">
+          <div>
+            <span className="lb-eyebrow">Partea pe care n-o vede clientul</span>
+            <h2 className="lb-h2">
+              El termină conversația.
+              <br />
+              <em>Ție îți sună telefonul.</em>
+            </h2>
+            <p className="lb-lede lb-lede-dim">
+              În secunda în care lasă numele și numărul, primești tot ce a spus — cu un buton de răspuns. Nu
+              trebuie să stai pe site și nici să citești conversația.
             </p>
-
-            <div className="mt-7 flex flex-wrap gap-2">
-              {biz.proof.map((p) => (
-                <span
-                  key={p.ro}
-                  className="chip inline-flex items-center gap-1.5 px-3 py-1.5 text-[12.5px] text-[color:var(--muted)]"
-                >
-                  <CheckIcon />
-                  {p.ro}
-                </span>
-              ))}
-            </div>
-
-            <div className="mt-8 flex flex-wrap items-center gap-4">
-              <a
-                href="#chat"
-                style={{ background: `linear-gradient(135deg, ${accent}, color-mix(in oklab, ${accent} 70%, #000))` }}
-                className="inline-flex items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:brightness-110 lg:hidden"
-              >
-                Încearcă asistentul
-                <ArrowIcon />
-              </a>
-              <p className="hidden items-center gap-2 text-sm text-[color:var(--muted)] lg:inline-flex">
-                <ArrowRightIcon />
-                Scrie-i ceva — răspunde pe loc, în română sau rusă.
-              </p>
+            <div className="lb-band-facts">
+              <div>
+                <b>2 sec</b>
+                <span>de la conversație la telefonul tău</span>
+              </div>
+              <div>
+                <b>24/7</b>
+                <span>inclusiv noaptea și în weekend</span>
+              </div>
             </div>
           </div>
 
-          {/* live chat panel */}
-          <div id="chat" className="rise scroll-mt-24" style={{ animationDelay: "120ms" }}>
-            <div className="relative">
-              <div
-                aria-hidden
-                style={{ background: accent }}
-                className="absolute -inset-4 -z-10 rounded-[28px] opacity-15 blur-3xl"
-              />
-              <ChatPanel biz={widgetBiz} className="panel-glow h-[540px] w-full" />
+          <div className="lb-phone" aria-hidden="true">
+            <div className="lb-phone-bar">
+              <span>21:47</span>
+              <span className="lb-phone-notch" />
+              <span>▲ ▮</span>
             </div>
-            <p className="mt-3 text-center text-[11.5px] text-[color:var(--muted)]/70">
-              Asistentul de mai sus e real — răspunsurile sunt generate în timp real.
-            </p>
-          </div>
-        </section>
-
-        {/* features */}
-        <section className="py-8 lg:py-14">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            Ce face pentru afacerea ta
-          </h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            <Feature
-              icon={<GlobeIcon />}
-              accent={accent}
-              title="Bilingv RO / RU"
-              body="Clienții vorbitori de română și rusă sunt serviți în limba lor din prima secundă, fără să aștepte pe cineva."
-            />
-            <Feature
-              icon={<ClockIcon />}
-              accent={accent}
-              title="Răspunde 24/7"
-              body="Preia întrebări și cereri și noaptea, în weekend, sau când linia telefonică e ocupată. Nu pierzi niciun client."
-            />
-            <Feature
-              icon={<InboxIcon />}
-              accent={accent}
-              title="Salvează fiecare lead"
-              body="Numele, contactul și ce anume vrea clientul ajung direct la tine — o listă gata de sunat, nu conversații pierdute."
-            />
-          </div>
-        </section>
-
-        {/* how it works */}
-        <section className="py-8 lg:py-14">
-          <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">Cum funcționează</h2>
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
-            <Step
-              n="1"
-              accent={accent}
-              title="Vizitatorul scrie"
-              body="Deschide chatul de pe site și întreabă ce-l interesează, în limba lui."
-            />
-            <Step
-              n="2"
-              accent={accent}
-              title="Asistentul califică"
-              body="Răspunde la întrebări și află exact ce vrea clientul — fără formulare lungi."
-            />
-            <Step
-              n="3"
-              accent={accent}
-              title="Lead-ul ajunge la tine"
-              body="Contactul și cererea se salvează automat. Tu doar suni un client deja interesat."
-            />
-          </div>
-        </section>
-
-        {/* cta strip */}
-        <section className="py-8 lg:py-14">
-          <div
-            className="card flex flex-col items-start justify-between gap-5 p-7 sm:flex-row sm:items-center"
-            style={{ borderColor: `color-mix(in oklab, ${accent} 30%, var(--line))` }}
-          >
-            <div>
-              <h3 className="text-xl font-semibold tracking-tight">
-                Vrei un asistent ca acesta pe site-ul tău?
-              </h3>
-              <p className="mt-1.5 text-sm text-[color:var(--muted)]">
-                Se instalează pe orice site și se configurează pentru afacerea ta.
-              </p>
+            <div className="lb-note">
+              <div className="lb-note-head">
+                <span className="lb-note-kind">Lead nou</span>
+                <div className="lb-note-name">Elena Rusu</div>
+                <div className="lb-note-biz">{biz.name}</div>
+              </div>
+              <dl className="lb-note-rows">
+                <div>
+                  <dt>Telefon</dt>
+                  <dd className="lb-note-tel">069 24 18 06</dd>
+                </div>
+                <div>
+                  <dt>Cere</dt>
+                  <dd>{demoRequest(biz.slug)}</dd>
+                </div>
+                <div>
+                  <dt>Primit</dt>
+                  <dd>azi, 21:47</dd>
+                </div>
+              </dl>
+              <span className="lb-note-btn">Răspunde pe WhatsApp</span>
             </div>
-            <a
-              href="#chat"
-              style={{ background: `linear-gradient(135deg, ${accent}, color-mix(in oklab, ${accent} 70%, #000))` }}
-              className="inline-flex shrink-0 items-center gap-2 rounded-xl px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:brightness-110"
-            >
-              Întreabă asistentul
-              <ArrowIcon />
-            </a>
           </div>
-        </section>
-      </main>
-
-      <footer className="mt-8 border-t border-white/5 py-8">
-        <div className="mx-auto max-w-6xl px-5 text-center text-[12.5px] text-[color:var(--muted)]/70">
-          {biz.name} · asistent AI · demo
         </div>
+      </section>
+
+      {/* ── what it does ── */}
+      <section className="lb-wrap lb-sec">
+        <div className="lb-head">
+          <div>
+            <span className="lb-eyebrow">Ce face</span>
+            <h2 className="lb-h2">Patru lucruri, în fiecare zi</h2>
+          </div>
+          <p className="lb-lede">
+            Nu e un chat care zice „vă răspundem în curând". Cunoaște oferta, pune întrebările potrivite și
+            închide cu un număr de telefon.
+          </p>
+        </div>
+
+        <div className="lb-cards">
+          {FEATURES.map((c, i) => (
+            <article key={c.t} className={"lb-card" + (i === 0 ? " lb-card-dark" : "")}>
+              <span className="lb-card-ic">{c.i}</span>
+              <h3>{c.t}</h3>
+              <p>{c.d}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      {/* ── install ── */}
+      <section className="lb-wrap lb-sec">
+        <div className="lb-head">
+          <div>
+            <span className="lb-eyebrow">Instalare</span>
+            <h2 className="lb-h2">Un rând de cod. Atât.</h2>
+          </div>
+          <p className="lb-lede">
+            Se pune pe orice site — WordPress, Tilda, Wix, sau unul scris de mână. Nu-ți schimbă nimic din ce
+            ai deja.
+          </p>
+        </div>
+
+        <div className="lb-code">
+          <div className="lb-code-bar">
+            <span className="lb-dots">
+              <i />
+              <i />
+              <i />
+            </span>
+            <span>site-ul tău · înainte de &lt;/body&gt;</span>
+          </div>
+          <pre>
+            <code>
+              <span className="tg">&lt;script</span> <span className="at">src</span>=
+              <span className="st">&quot;https://leadbot-inky.vercel.app/widget.js&quot;</span>
+              {"\n        "}
+              <span className="at">data-biz</span>=<span className="st">&quot;{biz.slug}&quot;</span>{" "}
+              <span className="at">defer</span>
+              <span className="tg">&gt;&lt;/script&gt;</span>
+            </code>
+          </pre>
+        </div>
+      </section>
+
+      {/* ── cta ── */}
+      <section className="lb-wrap lb-sec" id="pret">
+        <div className="lb-cta">
+          <div className="lb-cta-in">
+            <span className="lb-eyebrow">Hai să vorbim</span>
+            <h2 className="lb-h2">Vrei unul care să știe afacerea ta?</h2>
+            <p className="lb-lede lb-lede-dim">
+              Îl învăț serviciile, prețurile și programul tău. Îl vezi funcționând înainte să plătești ceva.
+            </p>
+            <div className="lb-cta-acts">
+              <a href="https://wa.me/37369859888" target="_blank" rel="noopener" className="lb-btn lb-btn-a">
+                <Wa />
+                Scrie-mi pe WhatsApp
+              </a>
+              <a
+                href="https://alex-macovetch1.github.io/portofoliu/"
+                target="_blank"
+                rel="noopener"
+                className="lb-btn lb-btn-g"
+              >
+                Vezi celelalte lucrări
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <footer className="lb-wrap lb-foot">
+        <span>Asistent bilingv pentru afaceri mici · Chișinău, Moldova</span>
+        <span>Demonstrație — ce scrii aici nu ajunge la nicio afacere reală.</span>
       </footer>
 
-      {/* floating widget — apare la scroll, ca pe un site real */}
-      <ChatWidget biz={widgetBiz} appearAfter={620} className="lg:block" />
+      <ChatWidget biz={widgetBiz} appearAfter={700} />
     </div>
   );
 }
 
-/* ---------- pieces ---------- */
-
-function Feature({
-  icon,
-  title,
-  body,
-  accent,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  body: string;
-  accent: string;
-}) {
-  return (
-    <div className="card p-5">
-      <span
-        style={{
-          color: accent,
-          background: `color-mix(in oklab, ${accent} 14%, transparent)`,
-          borderColor: `color-mix(in oklab, ${accent} 28%, transparent)`,
-        }}
-        className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border"
-      >
-        {icon}
-      </span>
-      <h3 className="text-[15px] font-semibold">{title}</h3>
-      <p className="mt-2 text-[13.5px] leading-relaxed text-[color:var(--muted)]">{body}</p>
-    </div>
-  );
-}
-
-function Step({
-  n,
-  title,
-  body,
-  accent,
-}: {
-  n: string;
-  title: string;
-  body: string;
-  accent: string;
-}) {
-  return (
-    <div className="card p-5">
-      <span
-        style={{ color: accent, borderColor: `color-mix(in oklab, ${accent} 35%, transparent)` }}
-        className="mb-4 flex h-9 w-9 items-center justify-center rounded-full border text-sm font-bold"
-      >
-        {n}
-      </span>
-      <h3 className="text-[15px] font-semibold">{title}</h3>
-      <p className="mt-2 text-[13.5px] leading-relaxed text-[color:var(--muted)]">{body}</p>
-    </div>
-  );
+/** A believable request line per demo, so the notification card reads real. */
+function demoRequest(slug: string): string {
+  if (slug === "imobiliar") return "Apartament 2 camere, Botanica, până în 400 €";
+  if (slug === "restaurant") return "Masă pentru 6 persoane, sâmbătă seara";
+  return "Curățare profesională, ar veni sâmbătă dimineața";
 }
 
 /* ---------- icons ---------- */
+const sv = {
+  viewBox: "0 0 24 24",
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.85,
+  strokeLinecap: "round" as const,
+  strokeLinejoin: "round" as const,
+};
 
-function CheckIcon() {
+function Check() {
   return (
-    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="accent-text">
-      <path d="m20 6-11 11-5-5" />
+    <svg width="12" height="12" {...sv} strokeWidth={3}>
+      <path d="m5 13 4.5 4.5L19 7" />
     </svg>
   );
 }
-
-function ArrowIcon() {
+function IconChat() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M5 12h14M13 6l6 6-6 6" />
+    <svg width="20" height="20" {...sv}>
+      <path d="M20.5 12.5a7.5 7.5 0 0 1-10.9 6.7L4 20.5l1.4-5.4A7.5 7.5 0 1 1 20.5 12.5z" />
+      <path d="M9 11.5h.01M12 11.5h.01M15 11.5h.01" />
     </svg>
   );
 }
-
-function ArrowRightIcon() {
+function IconSearch() {
   return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="accent-text">
-      <path d="M5 12h14M13 6l6 6-6 6" />
+    <svg width="20" height="20" {...sv}>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-3.6-3.6" />
     </svg>
   );
 }
-
-function GlobeIcon() {
+function IconPhone() {
   return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="20" height="20" {...sv}>
+      <path d="M6.5 3h3l1.5 4-2 1.5a12 12 0 0 0 5.5 5.5l1.5-2 4 1.5v3a2 2 0 0 1-2.2 2A17 17 0 0 1 4.5 5.2 2 2 0 0 1 6.5 3z" />
+    </svg>
+  );
+}
+function IconGlobe() {
+  return (
+    <svg width="20" height="20" {...sv}>
       <circle cx="12" cy="12" r="9" />
-      <path d="M3 12h18M12 3a15 15 0 0 1 0 18a15 15 0 0 1 0-18" />
+      <path d="M3 12h18" />
+      <path d="M12 3c2.3 2.5 3.5 5.7 3.5 9S14.3 18.5 12 21c-2.3-2.5-3.5-5.7-3.5-9S9.7 5.5 12 3z" />
+    </svg>
+  );
+}
+function Wa() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.47-2.39-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.91-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48s1.06 2.87 1.21 3.07c.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2-1.41.25-.7.25-1.29.18-1.42-.08-.12-.28-.2-.57-.35M12.05 21.79h-.01a9.87 9.87 0 0 1-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 0 1-1.51-5.26c0-5.45 4.44-9.89 9.89-9.89 2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 0 1 2.89 6.99c0 5.45-4.43 9.89-9.88 9.89m8.41-18.3A11.82 11.82 0 0 0 12.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 0 0 5.69 1.45c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.17-3.48-8.42Z" />
     </svg>
   );
 }
 
-function ClockIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 7v5l3.5 2" />
-    </svg>
-  );
-}
-
-function InboxIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 13h4l2 3h4l2-3h4" />
-      <path d="M5 5h14l2 8v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4z" />
-    </svg>
-  );
-}
+const FEATURES = [
+  {
+    t: "Răspunde la ce se întreabă mereu",
+    d: "Program, prețuri, unde te găsesc, ce servicii ai. Aceleași 20 de întrebări pe care le scrii de mână acum.",
+    i: <IconChat />,
+  },
+  {
+    t: "Caută în oferta ta",
+    d: "Îl întreabă pe client ce vrea, apoi îi arată exact ce ai potrivit — apartamente, servicii, meniu.",
+    i: <IconSearch />,
+  },
+  {
+    t: "Ia numărul de telefon",
+    d: "Duce discuția până la nume și număr, firesc, fără formulare care sperie lumea.",
+    i: <IconPhone />,
+  },
+  {
+    t: "Vorbește română și rusă",
+    d: "Trece dintr-una în alta după cum scrie clientul. Fără să alegi tu ceva.",
+    i: <IconGlobe />,
+  },
+];
