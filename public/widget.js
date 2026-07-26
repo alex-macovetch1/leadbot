@@ -68,14 +68,22 @@
     done = false;
 
   var CSS = [
-    "#lb-root,#lb-root *{box-sizing:border-box;margin:0;padding:0;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif}",
+    /* :where() keeps the reset at zero specificity, otherwise "#lb-root *"
+       outranks every .lb- class and strips their padding. */
+    ":where(#lb-root,#lb-root *){box-sizing:border-box;margin:0;padding:0;font-family:ui-sans-serif,system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;line-height:normal}",
     "#lb-root{--a:#1B36FF}",
 
     /* launcher */
-    "#lb-launch{position:fixed;bottom:20px;right:20px;z-index:2147483000;display:inline-flex;align-items:center;gap:9px;border:0;cursor:pointer;color:#fff;border-radius:999px;padding:13px 20px 13px 16px;font-size:14.5px;font-weight:600;letter-spacing:-.01em;box-shadow:0 10px 30px -8px rgba(0,0,0,.35);animation:lb-pop .5s cubic-bezier(.16,1,.3,1) both;transition:transform .3s cubic-bezier(.16,1,.3,1),box-shadow .3s}",
-    "#lb-launch:hover{transform:translateY(-2px) scale(1.02);box-shadow:0 16px 38px -10px rgba(0,0,0,.42)}",
+    "#lb-launch{position:fixed;bottom:20px;right:20px;z-index:2147483000;display:inline-flex;align-items:center;gap:9px;border:0;cursor:pointer;color:#fff;border-radius:999px;padding:13px 21px 13px 17px;font-size:14.5px;font-weight:600;letter-spacing:-.01em;box-shadow:0 12px 32px -10px var(--a-glow);animation:lb-pop .55s cubic-bezier(.16,1,.3,1) both,lb-breathe 4.5s ease-in-out 1.2s infinite;transition:transform .28s cubic-bezier(.16,1,.3,1),box-shadow .28s;overflow:visible}",
+    "#lb-launch:hover{transform:translateY(-3px) scale(1.04);box-shadow:0 20px 44px -12px var(--a-glow);animation-play-state:running,paused}",
+    "#lb-launch:active{transform:translateY(-1px) scale(.99)}",
+    "#lb-launch::before{content:'';position:absolute;inset:0;border-radius:999px;background:inherit;opacity:.55;z-index:-1;animation:lb-ripple 3.4s cubic-bezier(0,0,.2,1) infinite}",
+    "#lb-launch .lb-ic{display:flex;animation:lb-nudge 6s ease-in-out 2s infinite}",
+    "#lb-launch:hover .lb-ic{animation:none;transform:scale(1.08)}",
+    "#lb-launch .lb-badge{position:absolute;top:1px;right:1px;width:11px;height:11px;border-radius:999px;background:#10b981;box-shadow:0 0 0 2.5px #fff;animation:lb-blip 2.2s infinite}",
+    
     "#lb-launch svg{width:19px;height:19px;flex:none}",
-    "#lb-launch::after{content:'';position:absolute;inset:0;border-radius:999px;border:2px solid currentColor;opacity:0;animation:lb-ring 3.2s ease-out infinite 1.2s}",
+    
 
     /* panel */
     "#lb-panel{position:fixed;bottom:20px;right:20px;z-index:2147483000;width:min(94vw,384px);height:min(82vh,596px);display:none;flex-direction:column;overflow:hidden;border-radius:22px;background:#fff;color:#0f172a;box-shadow:0 2px 6px rgba(15,23,42,.06),0 30px 70px -22px rgba(15,23,42,.45)}",
@@ -89,10 +97,9 @@
     "#lb-htxt b{display:block;font-size:13.5px;font-weight:650;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
     "#lb-htxt span{display:flex;align-items:center;gap:6px;margin-top:2px;font-size:11px;color:#64748b}",
     ".lb-live{width:6px;height:6px;border-radius:999px;background:#10b981;flex:none;animation:lb-blip 2.2s infinite}",
-    "#lb-flags{display:flex;gap:1px;background:#f1f5f9;border-radius:999px;padding:3px;flex:none}",
-    "#lb-flags button{border:0;background:0;cursor:pointer;font-size:13px;line-height:1;padding:5px 6px;border-radius:999px;opacity:.4;transition:opacity .2s,background-color .2s}",
-    "#lb-flags button:hover{opacity:.8}",
-    "#lb-flags button[aria-pressed='true']{opacity:1;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.12)}",
+    "#lb-flags{display:inline-flex;align-items:center;gap:6px;border:0;cursor:pointer;background:#f1f5f9;border-radius:999px;padding:5px 10px 5px 6px;flex:none;transition:background-color .2s}",
+    "#lb-flags:hover{background:#e2e8f0}",
+    "#lb-flags span{font-size:10.5px;font-weight:650;letter-spacing:.06em;color:#64748b}",
     ".lb-flag{display:block;overflow:hidden;border-radius:3px;box-shadow:0 0 0 1px rgba(0,0,0,.12)}",
     ".lb-flag svg{display:block;width:100%;height:100%}",
     "#lb-x{border:0;background:0;cursor:pointer;color:#94a3b8;width:28px;height:28px;border-radius:999px;display:grid;place-items:center;flex:none;transition:background-color .2s,color .2s}",
@@ -163,7 +170,9 @@
     "@keyframes lb-chip{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}",
     "@keyframes lb-bounce{0%,80%,100%{opacity:.25;transform:translateY(0)}40%{opacity:1;transform:translateY(-3px)}}",
     "@keyframes lb-blip{0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.55)}50%{box-shadow:0 0 0 5px rgba(16,185,129,0)}}",
-    "@keyframes lb-ring{0%{opacity:.5;transform:scale(1)}70%,100%{opacity:0;transform:scale(1.35)}}",
+    "@keyframes lb-ripple{0%{opacity:.5;transform:scale(1)}60%,100%{opacity:0;transform:scale(1.45)}}",
+    "@keyframes lb-breathe{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}",
+    "@keyframes lb-nudge{0%,88%,100%{transform:rotate(0)}91%{transform:rotate(-14deg) scale(1.1)}95%{transform:rotate(10deg) scale(1.1)}}",
     "@media (prefers-reduced-motion:reduce){#lb-root *{animation:none!important;transition:none!important}}",
   ].join("");
 
@@ -229,9 +238,12 @@
 
     launch = el("button", { id: "lb-launch", type: "button", "aria-label": "Chat" });
     launch.style.position = "fixed";
-    launch.appendChild(svg(ICON.chat, 19, 1.9));
+    var lic = el("span", { class: "lb-ic" });
+    lic.appendChild(svg(ICON.chat, 19, 1.9));
+    launch.appendChild(lic);
     var lt = el("span", { id: "lb-launch-t" });
     launch.appendChild(lt);
+    launch.appendChild(el("span", { class: "lb-badge" }));
     launch.onclick = open;
 
     panel = el("div", { id: "lb-panel", role: "dialog", "aria-label": "Chat" });
@@ -249,21 +261,16 @@
     htxt.appendChild(headName);
     htxt.appendChild(headOn);
 
-    flagsEl = el("div", { id: "lb-flags" });
-    LANGS.forEach(function (lg) {
-      var b = el("button", { type: "button", "aria-pressed": "false", title: lg.name });
-      b.appendChild(flag(lg.code, 18, 13));
-      b.setAttribute("data-lg", lg.code);
-      b.onclick = function () {
-        if (lg.code === lang) return;
-        lang = lg.code;
-        convo = [];
-        done = false;
-        loading = false;
-        paint();
-      };
-      flagsEl.appendChild(b);
-    });
+    // One flag, showing the language already chosen. Tapping it goes back
+    // to the picker — the choice is made once, not offered twice.
+    flagsEl = el("button", { id: "lb-flags", type: "button" });
+    flagsEl.onclick = function () {
+      lang = null;
+      convo = [];
+      done = false;
+      loading = false;
+      paint();
+    };
 
     var x = el("button", { id: "lb-x", type: "button", "aria-label": "Close" });
     x.appendChild(svg(ICON.close, 15, 2));
@@ -288,6 +295,7 @@
 
   function tint() {
     root.style.setProperty("--a", cfg.accent);
+    root.style.setProperty("--a-glow", hexa(cfg.accent, 0.55));
     launch.style.background = cfg.accent;
     var av = document.getElementById("lb-av");
     if (av) av.style.background = cfg.accent;
@@ -317,10 +325,15 @@
     headName.textContent = lang ? pick(cfg.title) : pick(T.pickT);
     document.getElementById("lb-on-t").textContent = pick(T.online);
     headOn.style.display = lang ? "flex" : "none";
-    flagsEl.style.display = lang ? "flex" : "none";
-    [].forEach.call(flagsEl.children, function (b) {
-      b.setAttribute("aria-pressed", String(b.getAttribute("data-lg") === lang));
-    });
+    flagsEl.style.display = lang ? "inline-flex" : "none";
+    if (lang) {
+      var cur = LANGS.filter(function (x) { return x.code === lang; })[0];
+      flagsEl.innerHTML = "";
+      flagsEl.appendChild(flag(lang, 18, 13));
+      flagsEl.appendChild(el("span", null, lang.toUpperCase()));
+      flagsEl.setAttribute("title", cur ? cur.name : "");
+      flagsEl.setAttribute("aria-label", cur ? cur.name : "");
+    }
 
     msgsEl.innerHTML = "";
     footEl.innerHTML = "";

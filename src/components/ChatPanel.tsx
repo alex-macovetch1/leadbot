@@ -30,6 +30,8 @@ function Flag({ code }: { code: Lang }) {
   return (<span className={box}><svg viewBox="0 0 60 40" className="h-full w-full"><rect width="60" height="40" fill="#012169" /><path d="M0 0l60 40M60 0L0 40" stroke="#fff" strokeWidth="9" /><path d="M0 0l60 40M60 0L0 40" stroke="#C8102E" strokeWidth="4" /><path d="M30 0v40M0 20h60" stroke="#fff" strokeWidth="14" /><path d="M30 0v40M0 20h60" stroke="#C8102E" strokeWidth="8" /></svg></span>);
 }
 
+const LANG_NAME: Record<Lang, string> = { ro: "Română", ru: "Русский", en: "English" };
+
 const COPY = {
   placeholder: { ro: "Scrie un mesaj…", ru: "Напишите сообщение…", en: "Type a message…" },
   hint: { ro: "Sau alege o întrebare", ru: "Или выберите вопрос", en: "Or pick a question" },
@@ -132,21 +134,16 @@ export default function ChatPanel({
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
-          <div className="flex rounded-full bg-slate-100 p-0.5 text-[10.5px] font-semibold">
-            {((["ro", "ru", "en"] as Lang[])).map((code) => (
-              <button
-                key={code}
-                onClick={() => code !== lang && reset(code)}
-                aria-pressed={lang === code}
-                className={
-                  "flex items-center rounded-full px-2 py-1.5 transition " +
-                  (lang === code ? "bg-white text-slate-900 shadow-sm" : "text-slate-400 hover:text-slate-600")
-                }
-              >
-                <Flag code={code} />
-              </button>
-            ))}
-          </div>
+          {/* One flag: the language already chosen. Tapping it restarts in the next one. */}
+          <button
+            onClick={() => reset(lang === "ro" ? "ru" : lang === "ru" ? "en" : "ro")}
+            title={LANG_NAME[lang]}
+            aria-label={LANG_NAME[lang]}
+            className="flex items-center gap-1.5 rounded-full bg-slate-100 py-1.5 pl-1.5 pr-2.5 transition hover:bg-slate-200"
+          >
+            <Flag code={lang} />
+            <span className="text-[10.5px] font-semibold uppercase tracking-wide text-slate-500">{lang}</span>
+          </button>
 
           {convo.length > 0 && (
             <button
