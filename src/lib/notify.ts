@@ -18,6 +18,14 @@ export type LeadNotice = {
 const FROM = process.env.LEAD_EMAIL_FROM || "onboarding@resend.dev";
 const TO = process.env.LEAD_EMAIL_TO || "alex.shido.it@gmail.com";
 
+/* Only these bots email anybody. The others are demos shown to prospects —
+   people poke at them all day and none of it is a real enquiry. Add a slug
+   here (or to LEAD_NOTIFY_BIZ) when a bot goes live for a paying client. */
+const NOTIFY_FOR = (process.env.LEAD_NOTIFY_BIZ || "alexweb")
+  .split(",")
+  .map((s) => s.trim())
+  .filter(Boolean);
+
 /** Strip characters a phone number never contains, then build a wa.me link. */
 function waLink(phone: string): string | null {
   const digits = phone.replace(/\D/g, "");
@@ -72,7 +80,7 @@ function body(lead: LeadNotice, when: string): string {
 
 export async function notifyLead(lead: LeadNotice): Promise<void> {
   const key = process.env.RESEND_API_KEY;
-  if (!key) return;
+  if (!key || !NOTIFY_FOR.includes(lead.biz)) return;
 
   const when = new Intl.DateTimeFormat("ro-MD", {
     dateStyle: "medium",
