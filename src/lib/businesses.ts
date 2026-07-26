@@ -151,7 +151,7 @@ const ALEXWEB: Business = {
     { ro: "Boți AI bilingvi", ru: "Двуязычные AI-боты" },
     { ro: "Gata în ~5 zile", ru: "Готово за ~5 дней" },
   ],
-  accent: "#7c3aed",
+  accent: "#1B36FF",
   aiRole:
     "a friendly assistant for Alexandru Macovetchi, a web developer in Moldova who builds modern websites and installs AI chat assistants for local businesses",
   aiInfo:
