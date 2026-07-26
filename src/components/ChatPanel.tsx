@@ -8,6 +8,10 @@ import type { Listing } from "@/lib/listings";
 
 type Msg = { from: "bot" | "user"; text: string; cards?: Listing[] };
 
+/** Romanian is the guaranteed language; English may be missing on a config. */
+const tr = (b: { ro: string; ru: string; en?: string }, l: Lang) => b[l] ?? b.ro;
+const trL = (b: { ro: string[]; ru: string[]; en?: string[] }, l: Lang) => b[l] ?? b.ro;
+
 export type WidgetBiz = {
   slug: string;
   title: Bilingual;
@@ -16,12 +20,22 @@ export type WidgetBiz = {
   accent: string;
 };
 
+/* Drawn, not emoji — Windows does not render flag emoji. */
+function Flag({ code }: { code: Lang }) {
+  const box = "block h-[13px] w-[18px] overflow-hidden rounded-[3px] shadow-[0_0_0_1px_rgba(0,0,0,.12)]";
+  if (code === "ro")
+    return (<span className={box}><svg viewBox="0 0 3 2" className="h-full w-full"><rect width="1" height="2" fill="#002B7F" /><rect x="1" width="1" height="2" fill="#FCD116" /><rect x="2" width="1" height="2" fill="#CE1126" /></svg></span>);
+  if (code === "ru")
+    return (<span className={box}><svg viewBox="0 0 3 2" className="h-full w-full"><rect width="3" height="2" fill="#fff" /><rect y=".667" width="3" height=".667" fill="#0039A6" /><rect y="1.333" width="3" height=".667" fill="#D52B1E" /></svg></span>);
+  return (<span className={box}><svg viewBox="0 0 60 40" className="h-full w-full"><rect width="60" height="40" fill="#012169" /><path d="M0 0l60 40M60 0L0 40" stroke="#fff" strokeWidth="9" /><path d="M0 0l60 40M60 0L0 40" stroke="#C8102E" strokeWidth="4" /><path d="M30 0v40M0 20h60" stroke="#fff" strokeWidth="14" /><path d="M30 0v40M0 20h60" stroke="#C8102E" strokeWidth="8" /></svg></span>);
+}
+
 const COPY = {
-  placeholder: { ro: "Scrie un mesaj…", ru: "Напишите сообщение…" },
-  hint: { ro: "Sau alege o întrebare", ru: "Или выберите вопрос" },
-  reply: { ro: "răspunde imediat", ru: "отвечает сразу" },
-  doneT: { ro: "Te-am notat", ru: "Записали" },
-  doneD: { ro: "Revenim la tine cât de curând.", ru: "Свяжемся с вами в ближайшее время." },
+  placeholder: { ro: "Scrie un mesaj…", ru: "Напишите сообщение…", en: "Type a message…" },
+  hint: { ro: "Sau alege o întrebare", ru: "Или выберите вопрос", en: "Or pick a question" },
+  reply: { ro: "răspunde imediat", ru: "отвечает сразу", en: "replies instantly" },
+  doneT: { ro: "Te-am notat", ru: "Записали", en: "Got it" },
+  doneD: { ro: "Revenim la tine cât de curând.", ru: "Свяжемся с вами в ближайшее время.", en: "We will get back to you shortly." },
 };
 
 export default function ChatPanel({
@@ -48,7 +62,7 @@ export default function ChatPanel({
 
   function reset(to: Lang) {
     setLang(to);
-    setMessages([{ from: "bot", text: biz.greeting[to] }]);
+    setMessages([{ from: "bot", text: tr(biz.greeting, to) }]);
     setConvo([]);
     setInput("");
     setLoading(false);
@@ -109,27 +123,27 @@ export default function ChatPanel({
 
         <div className="min-w-0 flex-1 leading-tight">
           <div className="truncate text-[13.5px] font-semibold tracking-[-.01em] text-slate-900">
-            {biz.title[lang]}
+            {tr(biz.title, lang)}
           </div>
           <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-slate-500">
             <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            {UI.online[lang]} · {COPY.reply[lang]}
+            {tr(UI.online, lang)} · {COPY.reply[lang]}
           </div>
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
           <div className="flex rounded-full bg-slate-100 p-0.5 text-[10.5px] font-semibold">
-            {(["ro", "ru"] as Lang[]).map((code) => (
+            {((["ro", "ru", "en"] as Lang[])).map((code) => (
               <button
                 key={code}
                 onClick={() => code !== lang && reset(code)}
                 aria-pressed={lang === code}
                 className={
-                  "rounded-full px-2.5 py-1 uppercase tracking-wide transition " +
+                  "flex items-center rounded-full px-2 py-1.5 transition " +
                   (lang === code ? "bg-white text-slate-900 shadow-sm" : "text-slate-400 hover:text-slate-600")
                 }
               >
-                {code}
+                <Flag code={code} />
               </button>
             ))}
           </div>
@@ -137,8 +151,8 @@ export default function ChatPanel({
           {convo.length > 0 && (
             <button
               onClick={() => reset(lang)}
-              aria-label={UI.restart[lang]}
-              title={UI.restart[lang]}
+              aria-label={tr(UI.restart, lang)}
+              title={tr(UI.restart, lang)}
               className="icon-btn"
             >
               <RefreshIcon />
@@ -202,7 +216,7 @@ export default function ChatPanel({
               <p className="chip-in mb-0.5 text-[10.5px] font-medium uppercase tracking-[.12em] text-slate-400">
                 {COPY.hint[lang]}
               </p>
-              {biz.suggestions[lang].map((s, i) => (
+              {trL(biz.suggestions, lang).map((s, i) => (
                 <button
                   key={s}
                   onClick={() => send(s)}
@@ -235,7 +249,7 @@ export default function ChatPanel({
         {done ? (
           <button onClick={() => reset(lang)} className="restart-btn">
             <RefreshIcon />
-            {UI.restart[lang]}
+            {tr(UI.restart, lang)}
           </button>
         ) : (
           <form
@@ -253,7 +267,7 @@ export default function ChatPanel({
               disabled={loading}
               className="min-w-0 flex-1 bg-transparent px-4 text-[13.5px] text-slate-900 outline-none placeholder:text-slate-400 disabled:opacity-60"
             />
-            <button type="submit" aria-label={UI.send[lang]} disabled={loading || !input.trim()} className="send-btn">
+            <button type="submit" aria-label={tr(UI.send, lang)} disabled={loading || !input.trim()} className="send-btn">
               <SendIcon />
             </button>
           </form>
@@ -274,7 +288,7 @@ function ListingCard({ listing, lang }: { listing: Listing; lang: Lang }) {
   return (
     <div className="listing">
       <div className="flex items-start justify-between gap-2">
-        <div className="text-[13px] font-semibold text-slate-800">{listing.title[lang]}</div>
+        <div className="text-[13px] font-semibold text-slate-800">{listing.title[lang] ?? listing.title.ro}</div>
         <div className="whitespace-nowrap text-[13px] font-bold" style={{ color: "var(--a)" }}>
           {price}
         </div>

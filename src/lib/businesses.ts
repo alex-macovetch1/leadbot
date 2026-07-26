@@ -4,8 +4,8 @@
 // below. To make a demo for a new client, add one entry here and redeploy;
 // the demo URL is  /?b=<slug>.
 
-export type Bilingual = { ro: string; ru: string };
-export type BilingualList = { ro: string[]; ru: string[] };
+export type Bilingual = { ro: string; ru: string; en?: string };
+export type BilingualList = { ro: string[]; ru: string[]; en?: string[] };
 
 export type Business = {
   slug: string;
@@ -37,14 +37,16 @@ const REALESTATE: Business = {
     ro: "Un asistent de chat bilingv care pune întrebările potrivite, califică cererea și salvează fiecare lead — 24/7.",
     ru: "Двуязычный чат-ассистент, который задаёт нужные вопросы, квалифицирует запрос и сохраняет каждый лид — 24/7.",
   },
-  widgetTitle: { ro: "Asistent imobiliar", ru: "Помощник по недвижимости" },
+  widgetTitle: { ro: "Asistent imobiliar", ru: "Помощник по недвижимости", en: "Property assistant" },
   greeting: {
     ro: "Bună! 👋 Te ajut să găsești imobilul potrivit. Îți pun câteva întrebări scurte.",
     ru: "Здравствуйте! 👋 Помогу подобрать недвижимость. Задам пару коротких вопросов.",
+    en: "Hi! 👋 I will help you find the right property. Just a few quick questions.",
   },
   suggestions: {
     ro: ["Caut apartament cu 2 camere", "Vreau să închiriez", "Ce aveți în Botanica?"],
     ru: ["Ищу 2-комнатную квартиру", "Хочу арендовать", "Что есть на Ботанике?"],
+    en: ["Looking for a 2-room flat", "I want to rent", "What do you have in Botanica?"],
   },
   proof: [
     { ro: "Caută în ofertă live", ru: "Ищет по базе объектов" },
@@ -70,14 +72,16 @@ const DENTAL: Business = {
     ro: "Răspunde întrebărilor pacienților, preia programări și salvează contactul — chiar și noaptea sau când recepția e ocupată.",
     ru: "Отвечает пациентам, принимает записи и сохраняет контакт — даже ночью или когда ресепшн занят.",
   },
-  widgetTitle: { ro: "Asistent programări", ru: "Ассистент записи" },
+  widgetTitle: { ro: "Asistent programări", ru: "Ассистент записи", en: "Booking assistant" },
   greeting: {
     ro: "Bună ziua! 👋 Vă pot ajuta cu o programare sau întrebări despre servicii. Cu ce vă pot fi de folos?",
     ru: "Здравствуйте! 👋 Помогу записаться или отвечу на вопросы об услугах. Чем могу помочь?",
+    en: "Hello! 👋 I can book you in or answer questions about our treatments. How can I help?",
   },
   suggestions: {
     ro: ["Vreau o programare", "Cât costă un implant?", "Lucrați sâmbăta?"],
     ru: ["Хочу записаться", "Сколько стоит имплант?", "Работаете в субботу?"],
+    en: ["I would like an appointment", "How much is an implant?", "Are you open on Saturday?"],
   },
   proof: [
     { ro: "Preia programări", ru: "Принимает записи" },
@@ -104,14 +108,16 @@ const RESTAURANT: Business = {
     ro: "Un asistent care răspunde clienților, preia rezervări de masă și salvează contactul — fără să stea cineva pe telefon.",
     ru: "Ассистент, который отвечает гостям, принимает брони столиков и сохраняет контакт — без звонков.",
   },
-  widgetTitle: { ro: "Rezervări", ru: "Бронирование" },
+  widgetTitle: { ro: "Rezervări", ru: "Бронирование", en: "Reservations" },
   greeting: {
     ro: "Bună! 👋 Doriți o rezervare sau aveți o întrebare despre meniu ori program? Vă ajut cu drag.",
     ru: "Здравствуйте! 👋 Хотите забронировать столик или узнать о меню и часах? С радостью помогу.",
+    en: "Hi! 👋 Would you like a table, or something about the menu and opening hours? Happy to help.",
   },
   suggestions: {
     ro: ["Vreau o rezervare", "Aveți meniu pentru copii?", "Care e programul?"],
     ru: ["Хочу забронировать столик", "Есть детское меню?", "Какие часы работы?"],
+    en: ["I would like a table", "Do you have a kids menu?", "What are your opening hours?"],
   },
   proof: [
     { ro: "Preia rezervări", ru: "Принимает брони" },
@@ -137,14 +143,16 @@ const ALEXWEB: Business = {
     ro: "Construiesc site-uri la preț fix și instalez chatboturi AI bilingve care prind clienți 24/7 — chiar ca acesta.",
     ru: "Делаю сайты по фиксированной цене и ставлю двуязычных AI-ботов, которые ловят клиентов 24/7 — как этот.",
   },
-  widgetTitle: { ro: "Asistentul lui Alexandru", ru: "Ассистент Александра" },
+  widgetTitle: { ro: "Asistentul lui Alexandru", ru: "Ассистент Александра", en: "Alexandru's assistant" },
   greeting: {
     ro: "Bună! 👋 Sunt asistentul lui Alexandru. Vă pot spune cum vă facem un site sau un chatbot AI ca acesta. Cu ce afacere lucrați?",
     ru: "Здравствуйте! 👋 Я ассистент Александра. Расскажу, как сделать вам сайт или AI-бота, как этот. Какой у вас бизнес?",
+    en: "Hi! 👋 I am Alexandru's assistant. I can tell you how we build a website or a chatbot like this one. What kind of business do you run?",
   },
   suggestions: {
     ro: ["Vreau un site pentru afacerea mea", "Cât costă un bot ca acesta?", "În cât timp e gata?"],
     ru: ["Хочу сайт для бизнеса", "Сколько стоит такой бот?", "Как быстро будет готово?"],
+    en: ["I want a site for my business", "How much is a bot like this?", "How fast can it be ready?"],
   },
   proof: [
     { ro: "Site-uri la preț fix", ru: "Сайты по фикс. цене" },

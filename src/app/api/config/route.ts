@@ -22,6 +22,7 @@ export async function GET(request: Request) {
       name: biz.name,
       title: biz.widgetTitle,
       greeting: biz.greeting,
+      suggestions: biz.suggestions,
       accent: biz.accent,
     },
     { headers: CORS },

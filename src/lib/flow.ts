@@ -2,9 +2,9 @@
 // Data-driven and bilingual (RO / RU) so steps are easy to add or reorder
 // without touching the widget component.
 
-export type Lang = "ro" | "ru";
+export type Lang = "ro" | "ru" | "en";
 
-export type Bilingual = Record<Lang, string>;
+export type Bilingual = { ro: string; ru: string; en?: string };
 
 export type Option = {
   value: string;
@@ -34,10 +34,10 @@ export type Lead = {
 };
 
 export const UI = {
-  title: { ro: "Asistent imobiliar", ru: "Помощник по недвижимости" } as Bilingual,
-  online: { ro: "online", ru: "онлайн" } as Bilingual,
-  send: { ro: "Trimite", ru: "Отправить" } as Bilingual,
-  restart: { ro: "De la început", ru: "Сначала" } as Bilingual,
+  title: { ro: "Asistent imobiliar", ru: "Помощник по недвижимости", en: "Property assistant" } as Bilingual,
+  online: { ro: "online", ru: "онлайн", en: "online" } as Bilingual,
+  send: { ro: "Trimite", ru: "Отправить", en: "Send" } as Bilingual,
+  restart: { ro: "De la început", ru: "Сначала", en: "Start over" } as Bilingual,
   openLabel: { ro: "Scrie-ne", ru: "Напишите нам" } as Bilingual,
   thanks: {
     ro: "Mulțumim! Un agent te contactează în cel mai scurt timp. 📞",
@@ -126,5 +126,5 @@ export function isValidPhone(v: string): boolean {
 export function labelFor(field: keyof Lead, value: string, lang: Lang): string {
   const step = STEPS.find((s) => s.field === field);
   const opt = step?.options?.find((o) => o.value === value);
-  return opt ? opt.label[lang] : value;
+  return opt ? opt.label[lang] ?? opt.label.ro : value;
 }

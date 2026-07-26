@@ -19,7 +19,7 @@ export async function OPTIONS() {
 }
 
 export async function POST(request: Request) {
-  let body: { messages?: ChatMsg[]; biz?: string };
+  let body: { messages?: ChatMsg[]; biz?: string; lang?: string };
   try {
     body = await request.json();
   } catch {
@@ -28,10 +28,11 @@ export async function POST(request: Request) {
 
   const biz = getBusiness(body.biz);
   const messages = (body.messages ?? []).slice(-20); // keep the last turns only
+  const lang = body.lang === "ru" || body.lang === "en" ? body.lang : "ro";
 
   let reply: string;
   try {
-    reply = await chatComplete(buildSystemPrompt(biz), messages);
+    reply = await chatComplete(buildSystemPrompt(biz, lang), messages);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "AI error";
     return NextResponse.json({ error: msg }, { status: 502, headers: CORS });

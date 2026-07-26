@@ -8,11 +8,13 @@
 
 import type { Business } from "@/lib/businesses";
 
-export function buildSystemPrompt(biz: Business): string {
+export function buildSystemPrompt(biz: Business, lang?: string): string {
+  const LANGNAME = lang === "ru" ? "Russian" : lang === "en" ? "English" : "Romanian";
   const base = `You are ${biz.aiRole}, working on the website of "${biz.name}".
 
 LANGUAGE:
-- Reply in the SAME language the visitor writes in — Romanian or Russian. If unsure, use Romanian.
+- Reply in the SAME language the visitor writes in — Romanian, Russian or English.
+- The visitor picked ${LANGNAME} in the widget, so open in that language and stay there unless they switch.
 - Never mix languages in one message. Keep a warm, natural, human tone — not robotic.
 
 ABOUT THE BUSINESS (use this to answer questions; do not invent specifics you were not given, and never promise prices unless they are listed here):

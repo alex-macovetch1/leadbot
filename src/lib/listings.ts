@@ -14,7 +14,7 @@ export type Listing = {
   price: number;         // EUR — total for buy, per month for rent
   area: number;          // m²
   floor: string;         // e.g. "3/9"
-  title: { ro: string; ru: string };
+  title: { ro: string; ru: string; en?: string };
 };
 
 // deal · rooms · zone · price(EUR) · area
