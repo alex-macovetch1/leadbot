@@ -34,8 +34,18 @@ export async function POST(request: Request) {
 // table only ever held the real-estate flow, which is why the panel used to
 // look empty while the bot was capturing people just fine.
 export async function GET(request: Request) {
+  // No fallback key. This used to default to "demo" when ADMIN_KEY was unset,
+  // which published every captured name and phone number to anyone who typed
+  // the URL — the leads are other people's personal data, not ours to leak.
+  // An unconfigured deployment answers 401 and stays silent about why.
+  const adminKey = process.env.ADMIN_KEY;
+  if (!adminKey) {
+    console.error("ADMIN_KEY is not set — the leads endpoint stays closed.");
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const url = new URL(request.url);
-  if (url.searchParams.get("key") !== (process.env.ADMIN_KEY || "demo")) {
+  if (url.searchParams.get("key") !== adminKey) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   const biz = url.searchParams.get("biz") || undefined;
