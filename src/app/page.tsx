@@ -13,6 +13,8 @@ const DEMOS = [
   "cazare",
   "constructii",
   "veterinar",
+  "fitness",
+  "scoala",
 ] as const;
 
 export default async function Home({

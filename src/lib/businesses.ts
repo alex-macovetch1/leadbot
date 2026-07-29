@@ -485,6 +485,79 @@ const VETERINAR: Business = {
   formal: true,
 };
 
+const FITNESS: Business = {
+  slug: "fitness",
+  name: "Sala de fitness",
+  category: { ro: "Fitness · RO / RU", ru: "Фитнес · RO / RU" },
+  heroTitle: {
+    ro: "Răspunde despre abonamente, non-stop.",
+    ru: "Отвечает про абонементы, круглосуточно.",
+  },
+  heroSub: {
+    ro: "Spune ce abonamente sunt, cât costă și ce include fiecare — apoi notează cine vrea o vizită de probă.",
+    ru: "Расскажет про абонементы, цены и что входит — затем запишет тех, кто хочет пробное занятие.",
+  },
+  widgetTitle: { ro: "Abonamente și antrenamente", ru: "Абонементы и тренировки", en: "Memberships" },
+  greeting: {
+    ro: "Bună! 👋 Îți pot spune ce abonamente avem, cât costă și ce include fiecare. Ce te interesează?",
+    ru: "Привет! 👋 Расскажу про абонементы, цены и что входит. Что вас интересует?",
+    en: "Hi! 👋 I can tell you about our memberships, prices and what each includes. What are you after?",
+  },
+  suggestions: {
+    ro: ["Cât costă un abonament?", "Aveți antrenor personal?", "Pot veni la o probă?"],
+    ru: ["Сколько стоит абонемент?", "Есть персональный тренер?", "Можно на пробное?"],
+    en: ["How much is a membership?", "Do you have personal trainers?", "Can I try a session?"],
+  },
+  proof: [
+    { ro: "Explică abonamentele", ru: "Объясняет абонементы" },
+    { ro: "Preia înscrierea", ru: "Принимает запись" },
+    { ro: "Răspunde non-stop", ru: "Отвечает круглосуточно" },
+  ],
+  accent: "#7c3aed",
+  aiRole: "an energetic, welcoming assistant for a fitness club in Chișinău",
+  aiInfo:
+    "The club offers monthly and yearly memberships, group classes, personal training and a trial session. Open early morning to late evening, seven days a week. Prices depend on the membership length and whether classes are included.",
+  aiCollect:
+    "what they want to train for, whether they have trained before, and a phone number so the club can arrange a trial session",
+};
+
+const SCOALA_AUTO: Business = {
+  slug: "scoala",
+  name: "Școala auto",
+  category: { ro: "Școală auto · RO / RU", ru: "Автошкола · RO / RU" },
+  heroTitle: {
+    ro: "Răspunde la aceleași întrebări despre cursuri.",
+    ru: "Отвечает на одни и те же вопросы о курсах.",
+  },
+  heroSub: {
+    ro: "Cât costă, cât durează, ce acte trebuie, când începe grupa următoare — apoi notează cine vrea să se înscrie.",
+    ru: "Сколько стоит, сколько длится, какие документы нужны, когда следующая группа — затем записывает желающих.",
+  },
+  widgetTitle: { ro: "Înscrieri la cursuri", ru: "Запись на курсы", en: "Course sign-up" },
+  greeting: {
+    ro: "Bună ziua! 👋 Vă pot spune cât costă cursul, cât durează și ce acte trebuie. Ce categorie vă interesează?",
+    ru: "Здравствуйте! 👋 Расскажу, сколько стоит курс, сколько длится и какие документы нужны. Какая категория вас интересует?",
+    en: "Hello! 👋 I can tell you the course price, how long it takes and what documents you need. Which category?",
+  },
+  suggestions: {
+    ro: ["Cât costă cursul?", "Când începe grupa nouă?", "Ce acte îmi trebuie?"],
+    ru: ["Сколько стоит курс?", "Когда новая группа?", "Какие документы нужны?"],
+    en: ["How much is the course?", "When does the next group start?", "What documents do I need?"],
+  },
+  proof: [
+    { ro: "Explică prețul și durata", ru: "Объясняет цену и сроки" },
+    { ro: "Preia înscrierea", ru: "Принимает запись" },
+    { ro: "Răspunde non-stop", ru: "Отвечает круглосуточно" },
+  ],
+  accent: "#0284c7",
+  aiRole: "a patient, clear assistant for a driving school in Chișinău",
+  aiInfo:
+    "The school prepares for categories B and others, with theory classes and driving hours. Typical course length is two to three months. Documents needed: identity card, medical certificate and photos. Groups start regularly through the year.",
+  aiCollect:
+    "which category they want, whether they have started theory anywhere before, and a phone number for enrolment",
+  formal: true,
+};
+
 export const BUSINESSES: Record<string, Business> = {
   imobiliar: REALESTATE,
   dental: DENTAL,
@@ -496,6 +569,8 @@ export const BUSINESSES: Record<string, Business> = {
   cazare: CAZARE,
   constructii: CONSTRUCTII,
   veterinar: VETERINAR,
+  fitness: FITNESS,
+  scoala: SCOALA_AUTO,
 };
 
 export const DEFAULT_SLUG = "imobiliar";
