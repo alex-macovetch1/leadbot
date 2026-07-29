@@ -18,6 +18,9 @@ export type WidgetBiz = {
   greeting: Bilingual;
   suggestions: BilingualList;
   accent: string;
+  // Address the visitor with "dumneavoastră" instead of "tu". Small shops read
+  // better on first-name terms; a company with a support desk does not.
+  formal?: boolean;
 };
 
 /* Drawn, not emoji — Windows does not render flag emoji. */
@@ -40,6 +43,18 @@ const COPY = {
   doneD: { ro: "Revenim la tine cât de curând.", ru: "Свяжемся с вами в ближайшее время.", en: "We will get back to you shortly." },
 };
 
+const COPY_FORMAL = {
+  ...COPY,
+  placeholder: { ro: "Scrieți un mesaj…", ru: "Напишите сообщение…", en: "Type a message…" },
+  hint: { ro: "Sau alegeți o întrebare", ru: "Или выберите вопрос", en: "Or pick a question" },
+  doneT: { ro: "Am înregistrat solicitarea", ru: "Заявка зарегистрирована", en: "Request registered" },
+  doneD: {
+    ro: "Un operator revine cu un răspuns în cel mai scurt timp.",
+    ru: "Оператор свяжется с вами в ближайшее время.",
+    en: "An operator will get back to you shortly.",
+  },
+};
+
 export default function ChatPanel({
   biz,
   onClose,
@@ -49,6 +64,7 @@ export default function ChatPanel({
   onClose?: () => void;
   className?: string;
 }) {
+  const T = biz.formal ? COPY_FORMAL : COPY;
   const [lang, setLang] = useState<Lang>("ro");
   const [messages, setMessages] = useState<Msg[]>([{ from: "bot", text: biz.greeting.ro }]);
   const [convo, setConvo] = useState<ChatMsg[]>([]);
@@ -129,7 +145,7 @@ export default function ChatPanel({
           </div>
           <div className="mt-0.5 flex items-center gap-1.5 text-[11px] text-slate-500">
             <span className="live-dot h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            {tr(UI.online, lang)} · {COPY.reply[lang]}
+            {tr(UI.online, lang)} · {T.reply[lang]}
           </div>
         </div>
 
@@ -211,7 +227,7 @@ export default function ChatPanel({
           {showSuggestions && (
             <div className="mt-1 flex flex-col items-start gap-1.5 pl-[38px]">
               <p className="chip-in mb-0.5 text-[10.5px] font-medium uppercase tracking-[.12em] text-slate-400">
-                {COPY.hint[lang]}
+                {T.hint[lang]}
               </p>
               {trL(biz.suggestions, lang).map((s, i) => (
                 <button
@@ -233,8 +249,8 @@ export default function ChatPanel({
                 <CheckIcon />
               </span>
               <div className="leading-snug">
-                <div className="text-[13px] font-semibold text-emerald-900">{COPY.doneT[lang]}</div>
-                <div className="text-[12.5px] text-emerald-800/75">{COPY.doneD[lang]}</div>
+                <div className="text-[13px] font-semibold text-emerald-900">{T.doneT[lang]}</div>
+                <div className="text-[12.5px] text-emerald-800/75">{T.doneD[lang]}</div>
               </div>
             </div>
           )}
@@ -260,7 +276,7 @@ export default function ChatPanel({
               ref={inputRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder={COPY.placeholder[lang]}
+              placeholder={T.placeholder[lang]}
               disabled={loading}
               className="min-w-0 flex-1 bg-transparent px-4 text-[13.5px] text-slate-900 outline-none placeholder:text-slate-400 disabled:opacity-60"
             />

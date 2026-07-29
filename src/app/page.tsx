@@ -4,7 +4,16 @@ import ChatPanel from "@/components/ChatPanel";
 import ChatWidget from "@/components/ChatWidget";
 import { getBusiness, BUSINESSES } from "@/lib/businesses";
 
-const DEMOS = ["dental", "imobiliar", "restaurant"] as const;
+const DEMOS = [
+  "dental",
+  "imobiliar",
+  "restaurant",
+  "curier",
+  "service",
+  "cazare",
+  "constructii",
+  "veterinar",
+] as const;
 
 export default async function Home({
   searchParams,
@@ -20,6 +29,7 @@ export default async function Home({
     greeting: biz.greeting,
     suggestions: biz.suggestions,
     accent: biz.accent,
+    formal: biz.formal,
   };
 
   return (
@@ -32,26 +42,30 @@ export default async function Home({
             <b>{biz.name}</b>
           </span>
 
-          <div className="lb-switch" role="group" aria-label="Alege demonstrația">
-            {DEMOS.map((slug) => {
-              const d = BUSINESSES[slug];
-              return (
-                <Link
-                  key={slug}
-                  href={`/?b=${slug}`}
-                  aria-current={slug === biz.slug ? "true" : undefined}
-                  style={{ "--s": d.accent } as CSSProperties}
-                >
-                  <i />
-                  {d.category.ro.split(" ·")[0]}
-                </Link>
-              );
-            })}
-          </div>
+          {!biz.clientDemo && (
+            <div className="lb-switch" role="group" aria-label="Alege demonstrația">
+              {DEMOS.map((slug) => {
+                const d = BUSINESSES[slug];
+                return (
+                  <Link
+                    key={slug}
+                    href={`/?b=${slug}`}
+                    aria-current={slug === biz.slug ? "true" : undefined}
+                    style={{ "--s": d.accent } as CSSProperties}
+                  >
+                    <i />
+                    {d.category.ro.split(" ·")[0]}
+                  </Link>
+                );
+              })}
+            </div>
+          )}
 
-          <a href="#pret" className="lb-btn lb-btn-dark">
-            Vreau unul
-          </a>
+          {!biz.clientDemo && (
+            <a href="#pret" className="lb-btn lb-btn-dark">
+              Vreau unul
+            </a>
+          )}
         </nav>
       </div>
 
@@ -202,31 +216,59 @@ export default async function Home({
       <section className="lb-wrap lb-sec" id="pret">
         <div className="lb-cta">
           <div className="lb-cta-in">
-            <span className="lb-eyebrow">Hai să vorbim</span>
-            <h2 className="lb-h2">Vrei unul care să știe afacerea ta?</h2>
-            <p className="lb-lede lb-lede-dim">
-              Îl învăț serviciile, prețurile și programul tău. Îl vezi funcționând înainte să plătești ceva.
-            </p>
-            <div className="lb-cta-acts">
-              <a href="https://wa.me/37369859888" target="_blank" rel="noopener" className="lb-btn lb-btn-a">
-                <Wa />
-                Scrie-mi pe WhatsApp
-              </a>
-              <a
-                href="https://alex-macovetch1.github.io/portofoliu/"
-                target="_blank"
-                rel="noopener"
-                className="lb-btn lb-btn-g"
-              >
-                Vezi celelalte lucrări
-              </a>
-            </div>
+            {biz.clientDemo ? (
+              <>
+                <span className="lb-eyebrow">Demonstrație</span>
+                <h2 className="lb-h2">Pregătită pentru {biz.name}.</h2>
+                <p className="lb-lede lb-lede-dim">
+                  Cele zece tipuri de solicitări din lista dumneavoastră sunt deja configurate. Scrieți-i
+                  asistentului ca un client obișnuit și vedeți ce ajunge la operator.
+                </p>
+                <div className="lb-cta-acts">
+                  <a href="tel:+37369859888" className="lb-btn lb-btn-a">
+                    Alexandru Macovetchi · +373 69 859 888
+                  </a>
+                </div>
+              </>
+            ) : (
+              <>
+                <span className="lb-eyebrow">Hai să vorbim</span>
+                <h2 className="lb-h2">Vrei unul care să știe afacerea ta?</h2>
+                <p className="lb-lede lb-lede-dim">
+                  Îl învăț serviciile, prețurile și programul tău. Îl vezi funcționând înainte să plătești
+                  ceva.
+                </p>
+                <div className="lb-cta-acts">
+                  <a
+                    href="https://wa.me/37369859888"
+                    target="_blank"
+                    rel="noopener"
+                    className="lb-btn lb-btn-a"
+                  >
+                    <Wa />
+                    Scrie-mi pe WhatsApp
+                  </a>
+                  <a
+                    href="https://alex-macovetch1.github.io/portofoliu/"
+                    target="_blank"
+                    rel="noopener"
+                    className="lb-btn lb-btn-g"
+                  >
+                    Vezi celelalte lucrări
+                  </a>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
 
       <footer className="lb-wrap lb-foot">
-        <span>Asistent bilingv pentru afaceri mici · Chișinău, Moldova</span>
+        <span>
+          {biz.clientDemo
+            ? `Demonstrație pregătită pentru ${biz.name} · Alexandru Macovetchi`
+            : "Asistent bilingv pentru afaceri mici · Chișinău, Moldova"}
+        </span>
         <span>Demonstrație — ce scrii aici nu ajunge la nicio afacere reală.</span>
       </footer>
 

@@ -7,6 +7,18 @@
 export type Bilingual = { ro: string; ru: string; en?: string };
 export type BilingualList = { ro: string[]; ru: string[]; en?: string[] };
 
+// Support bots (biz.support) handle a fixed catalogue of request types instead
+// of one open-ended lead. Each topic either resolves in the chat itself or is
+// collected in full and handed to a human operator ready to execute.
+export type SupportTopic = {
+  key: string;
+  label: Bilingual;
+  // true  => the assistant answers on its own, no operator involved
+  // false => the assistant gathers `collect` and passes the request on
+  selfServe: boolean;
+  collect: string; // English; what the assistant must find out before handing over
+};
+
 export type Business = {
   slug: string;
   name: string;                 // shown in header / hero
@@ -23,6 +35,14 @@ export type Business = {
   aiInfo: string;               // services / hours / facts it may use
   aiCollect: string;            // what it should find out from the visitor
   search?: boolean;             // real-estate: qualify the visitor, then search the listings
+  support?: boolean;            // customer-support desk: route the visitor into one of `topics`
+  topics?: SupportTopic[];      // required when support is true
+  // Built for one named client rather than as a generic showcase. Hides the
+  // demo switcher, the sales CTA and the "small business" footer — a prospect
+  // should see a page made for them, not a template with other demos on it.
+  clientDemo?: boolean;
+  // Address the visitor with "dumneavoastră" rather than "tu" throughout the widget.
+  formal?: boolean;
 };
 
 const REALESTATE: Business = {
@@ -168,11 +188,314 @@ const ALEXWEB: Business = {
     "what kind of business the visitor runs, and whether they want a website, an AI chatbot like this one, or another kind of help",
 };
 
+// Courier support desk. The ten topics below are the ones the client's
+// Customer Service manager listed as their most frequent requests.
+const COURIER: Business = {
+  slug: "fancourier",
+  name: "FAN Courier Moldova",
+  category: { ro: "Curierat · RO / RU", ru: "Курьерская доставка · RO / RU" },
+  heroTitle: {
+    ro: "Un asistent care preia cererile clienților, non-stop.",
+    ru: "Ассистент, который принимает обращения клиентов круглосуточно.",
+  },
+  heroSub: {
+    ro: "Răspunde la întrebările frecvente și pregătește fiecare cerere completă pentru operator — fără ca acesta să mai poarte discuția de colectare a datelor.",
+    ru: "Отвечает на частые вопросы и передаёт оператору полностью подготовленную заявку — без сбора данных вручную.",
+  },
+  widgetTitle: { ro: "Asistent clienți", ru: "Помощник клиентов", en: "Customer assistant" },
+  greeting: {
+    ro: "Bună ziua! 👋 Sunt asistentul FAN Courier. Vă pot ajuta cu expedierile, livrările sau contul dumneavoastră. Cu ce vă pot fi de folos?",
+    ru: "Здравствуйте! 👋 Я ассистент FAN Courier. Помогу с отправлениями, доставкой или вашим аккаунтом. Чем могу помочь?",
+    en: "Hello! 👋 I am the FAN Courier assistant. I can help with shipments, deliveries or your account. How can I help?",
+  },
+  suggestions: {
+    ro: ["Când ajunge coletul meu?", "Vreau să schimb adresa de livrare", "Cum trimit un colet?"],
+    ru: ["Когда придёт моя посылка?", "Хочу изменить адрес доставки", "Как отправить посылку?"],
+    en: ["When will my parcel arrive?", "I want to change the delivery address", "How do I send a parcel?"],
+  },
+  proof: [
+    { ro: "Preia cererea completă", ru: "Собирает заявку целиком" },
+    { ro: "Răspunde 24/7", ru: "Отвечает 24/7" },
+    { ro: "Română și rusă", ru: "Румынский и русский" },
+  ],
+  accent: "#12356b",
+  aiRole:
+    "the customer-support assistant for FAN Courier Moldova, a courier company",
+  aiInfo: `FAN Courier Moldova delivers envelopes (up to 1 kg) and parcels (up to 30 kg, max 60x50x30 cm) anywhere in Moldova, normally within 24 hours. It has a central hub in Chișinău plus 10 hubs across the country, around 80 vehicles.
+Services: standard domestic delivery, same-day delivery, Saturday delivery, document return, cash-on-delivery (ramburs — the courier collects the money from the buyer and transfers it to the sender within 2-3 working days), road transport to and from Romania and the European Union, worldwide air freight, and FAN Fulfillment (warehousing and shipping for online shops).
+Customers are private individuals, companies and — above all — online shops.
+The public website is fancourier.md (Romanian, Russian and English) and has AWB tracking and a personal account area ("cabinet personal"). The short phone number is 14455.
+Do not invent tariffs, exact delivery dates or the current status of any particular parcel — you do not have access to the tracking system. When a price or a parcel status is needed, take the request and pass it on.`,
+  aiCollect:
+    "which of the ten support topics they need, and the specific details listed for that topic",
+  support: true,
+  clientDemo: true,
+  formal: true,
+  topics: [
+    {
+      key: "livrare_termen",
+      label: { ro: "Timp estimativ de livrare", ru: "Ориентировочный срок доставки" },
+      selfServe: false,
+      collect: "the AWB number, and a phone number to reply on",
+    },
+    {
+      key: "schimb_telefon",
+      label: { ro: "Modificare număr de contact", ru: "Изменение контактного номера" },
+      selfServe: false,
+      collect: "the AWB number, the current phone number on the shipment, and the new phone number",
+    },
+    {
+      key: "schimb_adresa",
+      label: { ro: "Modificare adresă / redirecționare", ru: "Изменение адреса / переадресация" },
+      selfServe: false,
+      collect: "the AWB number, the new full delivery address (city, street, number), and a contact phone number",
+    },
+    {
+      key: "amanare",
+      label: { ro: "Amânare dată livrare", ru: "Перенос даты доставки" },
+      selfServe: false,
+      collect: "the AWB number, the new preferred delivery date, and a contact phone number",
+    },
+    {
+      key: "expediere",
+      label: { ro: "Plasare expediție ocazională", ru: "Разовая отправка" },
+      selfServe: true,
+      collect:
+        "pickup address, delivery address, approximate weight, whether cash-on-delivery (ramburs) is needed and for what amount, plus the sender's name and phone",
+    },
+    {
+      key: "retur",
+      label: { ro: "Solicitare retur", ru: "Заявка на возврат" },
+      selfServe: false,
+      collect: "the AWB number, the reason for the return, and a contact phone number",
+    },
+    {
+      key: "colaborare",
+      label: { ro: "Solicitare de colaborare", ru: "Запрос о сотрудничестве" },
+      selfServe: true,
+      collect:
+        "the company name, what they ship and roughly how many parcels a month, the contact person's name, phone and email",
+    },
+    {
+      key: "activare_cont",
+      label: { ro: "Activarea contului", ru: "Активация аккаунта" },
+      selfServe: false,
+      collect: "the company or client name, the email used at registration, and a contact phone number",
+    },
+    {
+      key: "cabinet",
+      label: { ro: "Suport acces cabinet personal", ru: "Поддержка по личному кабинету" },
+      selfServe: true,
+      collect: "what exactly is not working — sign-in, forgotten password, or something inside the account",
+    },
+    {
+      key: "international",
+      label: { ro: "Suport livrări internaționale", ru: "Поддержка международных отправлений" },
+      selfServe: true,
+      collect: "the destination country, what is being shipped, and the approximate weight",
+    },
+  ],
+};
+
+// Demo-uri generice pe domenii, folosite în prospectare: fiecare firmă vede un
+// asistent din propriul domeniu, nu unul dintr-altul. Fără nume de client în ele —
+// varianta `fancourier` rămâne doar pentru FAN Courier și nu se arată nimănui altcuiva.
+const CURIER: Business = {
+  slug: "curier",
+  name: "Serviciul de curierat",
+  category: { ro: "Curierat · RO / RU", ru: "Курьерская доставка · RO / RU" },
+  heroTitle: {
+    ro: "Răspunde la „unde e coletul meu”, non-stop.",
+    ru: "Отвечает на «где моя посылка», круглосуточно.",
+  },
+  heroSub: {
+    ro: "Preia întrebările care se repetă toată ziua și predă operatorului doar cererile care chiar au nevoie de om — deja complete.",
+    ru: "Берёт на себя повторяющиеся вопросы и передаёт оператору только те заявки, где нужен человек — уже собранные полностью.",
+  },
+  widgetTitle: { ro: "Asistent clienți", ru: "Помощник клиентов", en: "Customer assistant" },
+  greeting: {
+    ro: "Bună ziua! 👋 Vă pot ajuta cu expedieri, livrări sau tarife. Cu ce vă pot fi de folos?",
+    ru: "Здравствуйте! 👋 Помогу с отправлениями, доставкой или тарифами. Чем могу помочь?",
+    en: "Hello! 👋 I can help with shipments, deliveries or rates. How can I help?",
+  },
+  suggestions: {
+    ro: ["Când ajunge coletul?", "Cât costă livrarea?", "Cum schimb adresa?"],
+    ru: ["Когда придёт посылка?", "Сколько стоит доставка?", "Как изменить адрес?"],
+    en: ["When will it arrive?", "How much is delivery?", "How do I change the address?"],
+  },
+  proof: [
+    { ro: "Răspunde non-stop", ru: "Отвечает круглосуточно" },
+    { ro: "Adună datele cererii", ru: "Собирает данные заявки" },
+    { ro: "Predă operatorului", ru: "Передаёт оператору" },
+  ],
+  accent: "#f97316",
+  aiRole: "a calm, precise customer-service assistant for a courier company in Moldova",
+  aiInfo:
+    "The company delivers parcels across Moldova and abroad. Typical topics: where a parcel is, delivery times, tariffs by weight and destination, changing a delivery address, how to send a parcel, working hours.",
+  aiCollect:
+    "the tracking number if they have one, what exactly they need, and a phone number the operator can call back on",
+  formal: true,
+};
+
+const SERVICE_AUTO: Business = {
+  slug: "service",
+  name: "Service auto",
+  category: { ro: "Service auto · RO / RU", ru: "Автосервис · RO / RU" },
+  heroTitle: {
+    ro: "Răspunde clienților cât timp ești sub mașină.",
+    ru: "Отвечает клиентам, пока вы под машиной.",
+  },
+  heroSub: {
+    ro: "Spune cât costă, ce se poate face și când e loc liber — apoi notează mașina, problema și telefonul, ca să suni la sigur.",
+    ru: "Скажет цену, что можно сделать и когда есть место — затем запишет машину, проблему и телефон, чтобы вы перезвонили наверняка.",
+  },
+  widgetTitle: { ro: "Programări service", ru: "Запись в сервис", en: "Service booking" },
+  greeting: {
+    ro: "Bună ziua! 👋 Vă pot spune ce lucrări facem, cât costă și când avem loc liber. Ce mașină aveți?",
+    ru: "Здравствуйте! 👋 Расскажу, какие работы делаем, сколько стоят и когда есть место. Какая у вас машина?",
+    en: "Hello! 👋 I can tell you what we do, what it costs and when we have a slot. What car do you drive?",
+  },
+  suggestions: {
+    ro: ["Cât costă o revizie?", "Aveți loc liber săptămâna asta?", "Faceți diagnoză?"],
+    ru: ["Сколько стоит ТО?", "Есть место на этой неделе?", "Делаете диагностику?"],
+    en: ["How much is a service?", "Any slot this week?", "Do you do diagnostics?"],
+  },
+  proof: [
+    { ro: "Spune prețul orientativ", ru: "Называет ориентировочную цену" },
+    { ro: "Preia programarea", ru: "Принимает запись" },
+    { ro: "Notează mașina și problema", ru: "Записывает машину и проблему" },
+  ],
+  accent: "#dc2626",
+  aiRole: "a practical, straight-talking assistant for a car service workshop in Moldova",
+  aiInfo:
+    "The workshop does servicing, diagnostics, brakes, suspension, engine work and tyre changes. It gives rough price ranges, never firm quotes without seeing the car. Typical hours Monday–Saturday.",
+  aiCollect:
+    "the car make, model and year, what the problem or the wanted job is, and when it would suit them to come in",
+  formal: true,
+};
+
+const CAZARE: Business = {
+  slug: "cazare",
+  name: "Pensiunea",
+  category: { ro: "Cazare · RO / RU", ru: "Проживание · RO / RU" },
+  heroTitle: {
+    ro: "Preia cereri de rezervare și noaptea.",
+    ru: "Принимает заявки на бронь даже ночью.",
+  },
+  heroSub: {
+    ro: "Răspunde despre camere, prețuri și ce e inclus, apoi notează datele rezervării — fără comision către platforme.",
+    ru: "Отвечает о номерах, ценах и что входит, затем записывает данные брони — без комиссии платформам.",
+  },
+  widgetTitle: { ro: "Rezervări", ru: "Бронирование", en: "Reservations" },
+  greeting: {
+    ro: "Bună ziua! 👋 Vă pot spune ce camere avem libere, cât costă și ce include. Pentru ce perioadă căutați?",
+    ru: "Здравствуйте! 👋 Расскажу, какие номера свободны, сколько стоят и что входит. На какие даты ищете?",
+    en: "Hello! 👋 I can tell you what rooms are free, prices and what is included. Which dates are you looking at?",
+  },
+  suggestions: {
+    ro: ["Aveți liber în weekend?", "Cât costă o noapte?", "Se poate cu animale?"],
+    ru: ["Есть свободно на выходные?", "Сколько стоит ночь?", "Можно с животными?"],
+    en: ["Anything free this weekend?", "How much per night?", "Are pets allowed?"],
+  },
+  proof: [
+    { ro: "Răspunde non-stop", ru: "Отвечает круглосуточно" },
+    { ro: "Preia rezervarea", ru: "Принимает бронь" },
+    { ro: "Fără comision", ru: "Без комиссии" },
+  ],
+  accent: "#0d9488",
+  aiRole: "a warm, hospitable assistant for a guesthouse in Moldova",
+  aiInfo:
+    "The guesthouse has rooms for two to six people, breakfast on request, parking, a terrace and an outdoor grill area. Check-in from 14:00, check-out until 12:00. Prices per night depend on the room and season.",
+  aiCollect:
+    "the arrival and departure dates, how many people, and a phone number for confirming the booking",
+  formal: true,
+};
+
+const CONSTRUCTII: Business = {
+  slug: "constructii",
+  name: "Firma de construcții",
+  category: { ro: "Construcții · RO / RU", ru: "Строительство · RO / RU" },
+  heroTitle: {
+    ro: "Preia cereri de ofertă, non-stop.",
+    ru: "Принимает заявки на смету, круглосуточно.",
+  },
+  heroSub: {
+    ro: "Află ce lucrare vrea omul, unde și cât de mare — și îți trimite cererea gata pregătită, nu un „sunați-mă”.",
+    ru: "Выясняет, какая работа нужна, где и какого объёма — и передаёт вам готовую заявку, а не «перезвоните мне».",
+  },
+  widgetTitle: { ro: "Cerere de ofertă", ru: "Заявка на смету", en: "Request a quote" },
+  greeting: {
+    ro: "Bună ziua! 👋 Vă pot spune ce lucrări facem și vă pregătesc o cerere de ofertă. Ce aveți de făcut?",
+    ru: "Здравствуйте! 👋 Расскажу, какие работы делаем, и подготовлю заявку на смету. Что нужно сделать?",
+    en: "Hello! 👋 I can tell you what we do and prepare a quote request. What do you need done?",
+  },
+  suggestions: {
+    ro: ["Cât costă o renovare?", "Faceți și acoperișuri?", "Lucrați în afara Chișinăului?"],
+    ru: ["Сколько стоит ремонт?", "Крыши делаете?", "Работаете за пределами Кишинёва?"],
+    en: ["How much is a renovation?", "Do you do roofs?", "Do you work outside Chișinău?"],
+  },
+  proof: [
+    { ro: "Află detaliile lucrării", ru: "Выясняет детали работы" },
+    { ro: "Pregătește cererea", ru: "Готовит заявку" },
+    { ro: "Nu pierde clientul", ru: "Не теряет клиента" },
+  ],
+  accent: "#ca8a04",
+  aiRole: "a competent, no-nonsense assistant for a construction and renovation company in Moldova",
+  aiInfo:
+    "The company does flat and house renovations, finishing work, roofing, facades and small builds. It never gives firm prices in chat — only rough ranges and the promise of a site visit for an exact quote.",
+  aiCollect:
+    "what work is needed, the location and approximate size in square metres, when they want it started, and a phone number",
+  formal: true,
+};
+
+const VETERINAR: Business = {
+  slug: "veterinar",
+  name: "Clinica veterinară",
+  category: { ro: "Veterinar · RO / RU", ru: "Ветеринария · RO / RU" },
+  heroTitle: {
+    ro: "Răspunde stăpânilor grijulii, non-stop.",
+    ru: "Отвечает встревоженным хозяевам круглосуточно.",
+  },
+  heroSub: {
+    ro: "Spune ce servicii sunt, cât costă și când e loc liber — iar în caz de urgență îndrumă omul imediat, fără să aștepte recepția.",
+    ru: "Расскажет об услугах, ценах и свободном времени — а при экстренном случае сразу подскажет, не дожидаясь ресепшн.",
+  },
+  widgetTitle: { ro: "Programări", ru: "Запись на приём", en: "Appointments" },
+  greeting: {
+    ro: "Bună ziua! 👋 Vă pot ajuta cu o programare sau întrebări despre servicii. Ce animăluț aveți?",
+    ru: "Здравствуйте! 👋 Помогу записаться или отвечу об услугах. Какой у вас питомец?",
+    en: "Hello! 👋 I can book you in or answer questions about our services. What pet do you have?",
+  },
+  suggestions: {
+    ro: ["Vreau o programare", "Cât costă o consultație?", "Ce fac în caz de urgență?"],
+    ru: ["Хочу записаться", "Сколько стоит приём?", "Что делать при экстренном случае?"],
+    en: ["I want an appointment", "How much is a consultation?", "What about emergencies?"],
+  },
+  proof: [
+    { ro: "Preia programări", ru: "Принимает записи" },
+    { ro: "Răspunde la întrebări", ru: "Отвечает на вопросы" },
+    { ro: "Îndrumă la urgențe", ru: "Подсказывает при экстренных случаях" },
+  ],
+  accent: "#16a34a",
+  aiRole: "a calm, reassuring reception assistant for a veterinary clinic in Chișinău",
+  aiInfo:
+    "The clinic offers consultations, vaccinations, sterilisation, dentistry, ultrasound and analyses, for cats and dogs mainly. For emergencies it tells the owner to come in straight away and to call ahead. Typical hours Monday–Saturday.",
+  aiCollect:
+    "what animal it is and its age, what is worrying them, and when it would suit them to come in",
+  formal: true,
+};
+
 export const BUSINESSES: Record<string, Business> = {
   imobiliar: REALESTATE,
   dental: DENTAL,
   restaurant: RESTAURANT,
   alexweb: ALEXWEB,
+  fancourier: COURIER,
+  curier: CURIER,
+  service: SERVICE_AUTO,
+  cazare: CAZARE,
+  constructii: CONSTRUCTII,
+  veterinar: VETERINAR,
 };
 
 export const DEFAULT_SLUG = "imobiliar";
