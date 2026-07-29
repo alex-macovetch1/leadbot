@@ -11,10 +11,35 @@ export type ChatMsg = { role: "user" | "model"; text: string };
 
 const MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 
+/* Cota gratuită se epuizează după câteva conversații la rând, iar atunci
+   vizitatorul primea „ceva n-a mers" — exact în clipa în care un client
+   potențial încearcă demonstrația. Așa că la 429 (sau 503) trecem pe un
+   model mai mic, cu limită separată: un răspuns puțin mai simplu e mult
+   mai bun decât niciun răspuns. */
+const REZERVE = [
+  process.env.GEMINI_MODEL_FALLBACK || "gemini-2.0-flash-lite",
+  "gemini-2.0-flash",
+];
+
 export async function chatComplete(system: string, messages: ChatMsg[]): Promise<string> {
   const key = process.env.GEMINI_API_KEY;
   if (!key) throw new Error("GEMINI_API_KEY lipsește (adaugă-l în .env.local).");
 
+  let ultima = "";
+  for (const model of [MODEL, ...REZERVE]) {
+    try {
+      return await cerere(model, key, system, messages);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      ultima = msg;
+      // doar limitele de cotă / indisponibilitatea merită reîncercate pe alt model
+      if (!/\b(429|503|500)\b/.test(msg)) throw e;
+    }
+  }
+  throw new Error(ultima);
+}
+
+async function cerere(MODEL: string, key: string, system: string, messages: ChatMsg[]): Promise<string> {
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${key}`;
   const body = {
     systemInstruction: { parts: [{ text: system }] },

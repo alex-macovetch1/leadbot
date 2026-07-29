@@ -117,8 +117,8 @@ export default function ChatPanel({
           from: "bot",
           text:
             lang === "ru"
-              ? "Извините, что-то пошло не так. Попробуйте ещё раз."
-              : "Scuze, ceva n-a mers. Mai încearcă o dată.",
+              ? "Извините, сейчас много обращений — попробуйте ещё раз через минуту."
+              : "Scuze, am prea multe cereri chiar acum — mai încercați o dată peste un minut.",
         },
       ]);
     } finally {
