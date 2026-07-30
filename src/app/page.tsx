@@ -97,6 +97,11 @@ export default async function Home({
         </div>
       </header>
 
+      {/* Everything below the chat is sales material aimed at the owner. On a
+          demo built for one named prospect it reads like being pitched at, so
+          the page ends with the assistant itself. */}
+      {!biz.clientDemo && (
+      <>
       {/* ── the payoff: what the owner receives ── */}
       <section className="lb-band">
         <div className="lb-wrap lb-band-grid">
@@ -213,6 +218,8 @@ export default async function Home({
           </pre>
         </div>
       </section>
+      </>
+      )}
 
       {/* ── cta ── */}
       <section className="lb-wrap lb-sec" id="pret">
@@ -223,8 +230,7 @@ export default async function Home({
                 <span className="lb-eyebrow">Demonstrație</span>
                 <h2 className="lb-h2">Pregătită pentru {biz.name}.</h2>
                 <p className="lb-lede lb-lede-dim">
-                  Cele zece tipuri de solicitări din lista dumneavoastră sunt deja configurate. Scrieți-i
-                  asistentului ca un client obișnuit și vedeți ce ajunge la operator.
+                  Scrieți-i asistentului ca un client obișnuit și vedeți ce ajunge la dumneavoastră.
                 </p>
                 <div className="lb-cta-acts">
                   <a href="tel:+37369859888" className="lb-btn lb-btn-a">
