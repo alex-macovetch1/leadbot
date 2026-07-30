@@ -558,7 +558,49 @@ const SCOALA_AUTO: Business = {
   formal: true,
 };
 
+// Parents ask the same six questions — age, groups, schedule, price, location,
+// kit — and they ask them in the evening, when nobody is at the pitch.
+const FOTBAL: Business = {
+  slug: "fotbal",
+  name: "Școala de Fotbal",
+  category: { ro: "Fotbal pentru copii · RO / RU", ru: "Футбол для детей · RO / RU" },
+  heroTitle: {
+    ro: "Răspunde părinților seara, când nu e nimeni la teren.",
+    ru: "Отвечает родителям вечером, когда никого нет на поле.",
+  },
+  heroSub: {
+    ro: "De la ce vârstă, ce grupe, orar, preț, unde e terenul — apoi notează copilul la o probă și trimite cererea în CRM-ul vostru.",
+    ru: "С какого возраста, какие группы, расписание, цена, где поле — затем записывает ребёнка на пробную и отправляет заявку в вашу CRM.",
+  },
+  widgetTitle: { ro: "Înscriere la fotbal", ru: "Запись в футбольную школу", en: "Football sign-up" },
+  greeting: {
+    ro: "Bună ziua! 👋 Vă pot spune de la ce vârstă primim copii, ce grupe avem și cum e orarul. Ce vârstă are copilul?",
+    ru: "Здравствуйте! 👋 Расскажу, с какого возраста принимаем детей, какие есть группы и расписание. Сколько лет ребёнку?",
+    en: "Hello! 👋 I can tell you from what age we take children, our groups and the schedule. How old is your child?",
+  },
+  suggestions: {
+    ro: ["De la ce vârstă primiți?", "Cât costă pe lună?", "Când sunt antrenamentele?"],
+    ru: ["С какого возраста берёте?", "Сколько стоит в месяц?", "Когда тренировки?"],
+    en: ["From what age do you accept?", "How much per month?", "When are the trainings?"],
+  },
+  proof: [
+    { ro: "Răspunde seara și în weekend", ru: "Отвечает вечером и в выходные" },
+    { ro: "Notează copilul la probă", ru: "Записывает ребёнка на пробную" },
+    { ro: "Trimite cererea în CRM", ru: "Отправляет заявку в CRM" },
+  ],
+  accent: "#15803d",
+  aiRole:
+    "a warm, patient assistant for a children's football school in Chișinău, talking to parents",
+  aiInfo:
+    "The school takes children from the age of 3. Children are placed in groups by age, so the training matches what a child of that age can actually do. Training sessions run several times a week, in the afternoon and at weekends, so they fit around kindergarten and school. A first trial session lets the child try it before the parents decide anything. Children need sports clothes and football boots; the school advises on what to buy for the smallest ones. Exact prices, the current schedule for each age group and the address of the pitch are confirmed by a coach when they call back.",
+  aiCollect:
+    "the child's age, whether the child has played football anywhere before, which part of the city is convenient for them, and a phone number so a coach can call back and book the trial session",
+  formal: true,
+  clientDemo: true,
+};
+
 export const BUSINESSES: Record<string, Business> = {
+  fotbal: FOTBAL,
   imobiliar: REALESTATE,
   dental: DENTAL,
   restaurant: RESTAURANT,
