@@ -279,11 +279,27 @@ export default async function Home({
   );
 }
 
-/** A believable request line per demo, so the notification card reads real. */
+/** A believable request line per demo, so the notification card reads real.
+ *  Every slug needs its own line — a prospect who sees another trade's request
+ *  on their own demo stops believing the rest of the page. */
+const DEMO_REQUEST: Record<string, string> = {
+  imobiliar: "Apartament 2 camere, Botanica, până în 400 €",
+  restaurant: "Masă pentru 6 persoane, sâmbătă seara",
+  dental: "Curățare profesională, ar veni sâmbătă dimineața",
+  veterinar: "Pisică, vaccin anual, ar veni joi după-amiază",
+  fitness: "Abonament lunar, vrea să înceapă săptămâna asta",
+  scoala: "Categoria B, întreabă când începe grupa nouă",
+  fotbal: "Băiat de 4 ani, întreabă de antrenamentul de probă",
+  service: "Schimb de ulei și verificat frânele, Logan 2016",
+  cazare: "Două nopți pentru 3 persoane, weekendul viitor",
+  constructii: "Renovare baie 6 m², cere deviz",
+  curier: "Colet 5 kg spre Bălți, ridicare mâine dimineață",
+  fancourier: "Colet 5 kg spre Bălți, ridicare mâine dimineață",
+  alexweb: "Site de prezentare, 5 pagini, cere ofertă",
+};
+
 function demoRequest(slug: string): string {
-  if (slug === "imobiliar") return "Apartament 2 camere, Botanica, până în 400 €";
-  if (slug === "restaurant") return "Masă pentru 6 persoane, sâmbătă seara";
-  return "Curățare profesională, ar veni sâmbătă dimineața";
+  return DEMO_REQUEST[slug] ?? DEMO_REQUEST.imobiliar;
 }
 
 /* ---------- icons ---------- */
