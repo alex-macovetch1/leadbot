@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import { headers } from "next/headers";
 import Link from "next/link";
 import ChatPanel from "@/components/ChatPanel";
 import ChatWidget from "@/components/ChatWidget";
@@ -23,7 +24,8 @@ export default async function Home({
   searchParams: Promise<{ b?: string }>;
 }) {
   const { b } = await searchParams;
-  const biz = getBusiness(b);
+  const host = (await headers()).get("host") ?? "";
+  const biz = getBusiness(b ?? slugDinGazda(host));
 
   const widgetBiz = {
     slug: biz.slug,
@@ -283,6 +285,16 @@ export default async function Home({
       <ChatWidget biz={widgetBiz} appearAfter={700} />
     </div>
   );
+}
+
+/** Demo-ul unui client se trimite ca link curat, nu ca `?b=slug` dintr-o listă:
+ *  fiecare are propriul subdomeniu (lasermed-demo.vercel.app), iar numele de
+ *  dinaintea primei cratime alege afacerea. Domeniul principal nu se potrivește
+ *  cu nimic, deci acolo rămâne demonstrația implicită. */
+function slugDinGazda(host: string): string | undefined {
+  const eticheta = host.split(":")[0].split(".")[0].toLowerCase();
+  const nume = eticheta.split("-")[0];
+  return BUSINESSES[nume] ? nume : undefined;
 }
 
 /** A believable request line per demo, so the notification card reads real.
