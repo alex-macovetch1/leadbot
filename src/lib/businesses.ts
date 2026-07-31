@@ -35,6 +35,7 @@ export type Business = {
   aiInfo: string;               // services / hours / facts it may use
   aiCollect: string;            // what it should find out from the visitor
   search?: boolean;             // real-estate: qualify the visitor, then search the listings
+  grupe?: boolean;              // școală sportivă: caută grupa liberă și înscrie copilul
   support?: boolean;            // customer-support desk: route the visitor into one of `topics`
   topics?: SupportTopic[];      // required when support is true
   // Built for one named client rather than as a generic showcase. Hides the
@@ -562,45 +563,59 @@ const SCOALA_AUTO: Business = {
   formal: true,
 };
 
-// Parents ask the same six questions — age, groups, schedule, price, location,
-// kit — and they ask them in the evening, when nobody is at the pitch.
-const FOTBAL: Business = {
-  slug: "fotbal",
-  name: "Școala de Fotbal",
+/* TRACIA — cea mai mare rețea de școli de fotbal din Moldova, 6 filiale.
+   Datele sunt cele reale, de pe tracia.md și din scriptul managerilor lor:
+   pe astea le repetă azi un om, la telefon și pe Viber, de zeci de ori pe zi.
+   Câmpurile pe care le adună botul sunt exact câmpurile din amoCRM-ul lor
+   („Botanica 2021" = SECTOR + ANUL NAȘTERII, NUMELE COPILULUI), ca cererea
+   să intre în pâlnie gata completată, nu ca o notiță de recitit. */
+const TRACIA: Business = {
+  slug: "tracia",
+  name: "TRACIA",
   category: { ro: "Fotbal pentru copii · RO / RU", ru: "Футбол для детей · RO / RU" },
   heroTitle: {
     ro: "Răspunde părinților seara, când nu e nimeni la teren.",
     ru: "Отвечает родителям вечером, когда никого нет на поле.",
   },
   heroSub: {
-    ro: "De la ce vârstă, ce grupe, orar, preț, unde e terenul — apoi notează copilul la o probă și trimite cererea în CRM-ul vostru.",
-    ru: "С какого возраста, какие группы, расписание, цена, где поле — затем записывает ребёнка на пробную и отправляет заявку в вашу CRM.",
+    ro: "De la ce vârstă, ce grupă, orar, preț, unde e terenul — apoi verifică unde mai e loc liber, înscrie copilul la antrenamentul gratuit și trimite cererea în amoCRM.",
+    ru: "С какого возраста, какие группы, расписание, цена, где поле — затем проверяет, где есть места, записывает на бесплатную тренировку и отправляет заявку в amoCRM.",
   },
   widgetTitle: { ro: "Înscriere la fotbal", ru: "Запись в футбольную школу", en: "Football sign-up" },
   greeting: {
-    ro: "Bună ziua! 👋 Vă pot spune de la ce vârstă primim copii, ce grupe avem și cum e orarul. Ce vârstă are copilul?",
-    ru: "Здравствуйте! 👋 Расскажу, с какого возраста принимаем детей, какие есть группы и расписание. Сколько лет ребёнку?",
-    en: "Hello! 👋 I can tell you from what age we take children, our groups and the schedule. How old is your child?",
+    ro: "Bună ziua! 👋 Vă pot spune ce grupe avem, unde mai sunt locuri libere și vă înscriu copilul la un antrenament gratuit. Câți ani are copilul?",
+    ru: "Здравствуйте! 👋 Расскажу, какие есть группы, где остались места, и запишу ребёнка на бесплатную тренировку. Сколько лет ребёнку?",
+    en: "Hello! 👋 I can tell you about our groups, where places are left, and book a free trial session. How old is your child?",
   },
   suggestions: {
-    ro: ["De la ce vârstă primiți?", "Cât costă pe lună?", "Când sunt antrenamentele?"],
-    ru: ["С какого возраста берёте?", "Сколько стоит в месяц?", "Когда тренировки?"],
-    en: ["From what age do you accept?", "How much per month?", "When are the trainings?"],
+    ro: ["Am un copil de 5 ani, unde îl pot da?", "Mai aveți locuri la Botanica?", "Cât costă abonamentul?"],
+    ru: ["Ребёнку 5 лет, куда можно?", "Есть места на Ботанике?", "Сколько стоит абонемент?"],
+    en: ["My child is 5, where can I enrol?", "Any places left in Botanica?", "How much is the membership?"],
   },
   proof: [
-    { ro: "Răspunde seara și în weekend", ru: "Отвечает вечером и в выходные" },
-    { ro: "Notează copilul la probă", ru: "Записывает ребёнка на пробную" },
-    { ro: "Trimite cererea în CRM", ru: "Отправляет заявку в CRM" },
+    { ro: "Vede unde mai sunt locuri libere", ru: "Видит, где остались места" },
+    { ro: "Înscrie la antrenamentul gratuit", ru: "Записывает на бесплатную тренировку" },
+    { ro: "Trimite cererea în amoCRM", ru: "Отправляет заявку в amoCRM" },
   ],
   accent: "#15803d",
   aiRole:
-    "a warm, patient assistant for a children's football school in Chișinău, talking to parents",
-  aiInfo:
-    "The school takes children from the age of 3. Children are placed in groups by age, so the training matches what a child of that age can actually do. Training sessions run several times a week, in the afternoon and at weekends, so they fit around kindergarten and school. A first trial session lets the child try it before the parents decide anything. Children need sports clothes and football boots; the school advises on what to buy for the smallest ones. Exact prices, the current schedule for each age group and the address of the pitch are confirmed by a coach when they call back.",
+    "the assistant of TRACIA, the largest network of children's football schools in Moldova, talking to parents on the school's website",
+  aiInfo: `TRACIA takes children from the age of 3, boys and girls alike, with or without any sports experience before.
+Branches: CHIȘINĂU — Botanica, Telecentru, Buiucani; BĂLȚI (sectorul BAM); HÎNCEȘTI; ANENII NOI (s. Țînțăreni).
+Children are grouped by BRANCH and YEAR OF BIRTH — a group is called for example "Botanica 2021".
+The first session is a FREE TRIAL: the child tries it before the parents decide anything.
+Membership: 1190 lei. It covers 8 consecutive training sessions, and training happens twice a week.
+On enrolment the child receives a gift: the TRACIA backpack and the young footballer's motivational notebook — the child collects stickers, passes stages, and is encouraged to be disciplined, present and involved.
+Why parents bring children here: the energy goes somewhere healthy, the child socialises and adapts to a group step by step, and spends less time on the phone or tablet. Children move through play, learn to listen to the coach, to respect simple rules and to interact with other children. Everything is done gradually, patiently, without pressure, in a friendly and safe environment.
+TRACIA works officially, on a contract, with payment confirmations — parents can use the payment documents for annual tax deductions where that applies.
+Phone: 069691444. The school talks to parents mostly on Viber.
+Do not invent a schedule, an address of a pitch or a price that is not written here. The exact pitch address and the confirmed hour are given by the coach when they call back.`,
   aiCollect:
-    "the child's age, whether the child has played football anywhere before, which part of the city is convenient for them, and a phone number so a coach can call back and book the trial session",
+    "the child's age or year of birth, whether it is a boy or a girl, whether the child has done any sport before, which branch is convenient, which group has room, the parent's name, the child's name, and a Viber number",
   formal: true,
   clientDemo: true,
+  grupe: true,
+  siteUrl: "https://tracia.md/",
 };
 
 // Cabinet de chirurgie laser. Recepția e deschisă 34 de ore pe săptămână și se
@@ -663,7 +678,9 @@ DISCRETION: many of the requests here are intimate or embarrassing — haemorrho
 
 export const BUSINESSES: Record<string, Business> = {
   lasermed: LASERMED,
-  fotbal: FOTBAL,
+  // „fotbal" ramane ca sa nu se rupa linkurile trimise deja clientului
+  tracia: TRACIA,
+  fotbal: TRACIA,
   imobiliar: REALESTATE,
   dental: DENTAL,
   restaurant: RESTAURANT,

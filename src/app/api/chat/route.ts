@@ -5,6 +5,8 @@ import { getBusiness } from "@/lib/businesses";
 import { saveDemoLead } from "@/lib/leads";
 import { notifyLead } from "@/lib/notify";
 import { searchListings, type Listing } from "@/lib/listings";
+import { grupeText } from "@/lib/grupe";
+import { trimiteInAmoCrm } from "@/lib/amocrm";
 
 // The widget is embedded on other domains (the portfolio and clients' sites),
 // so the endpoint must allow cross-origin requests.
@@ -30,9 +32,13 @@ export async function POST(request: Request) {
   const messages = (body.messages ?? []).slice(-20); // keep the last turns only
   const lang = body.lang === "ru" || body.lang === "en" ? body.lang : "ro";
 
+  /* Școlile sportive au nevoie de locurile libere din chiar clipa asta —
+     altfel botul trimite părintele într-o grupă completă. */
+  const live = biz.grupe ? await grupeText() : undefined;
+
   let reply: string;
   try {
-    reply = await chatComplete(buildSystemPrompt(biz, lang), messages);
+    reply = await chatComplete(buildSystemPrompt(biz, lang, live), messages);
   } catch (e) {
     const msg = e instanceof Error ? e.message : "AI error";
     return NextResponse.json({ error: msg }, { status: 502, headers: CORS });
@@ -73,6 +79,10 @@ export async function POST(request: Request) {
       // Store first: the lead must survive even if the notification fails.
       await saveDemoLead(lead);
       await notifyLead({ ...lead, bizTitle: biz.name });
+      /* La botii pe grupe, prima bucata din „details" e chiar numele grupei —
+         asa lead-ul apare in amoCRM cu titlul cu care lucreaza ei. */
+      const titlu = biz.grupe ? String(lead.details).split(" · ")[0].trim() : undefined;
+      await trimiteInAmoCrm({ bizTitle: biz.name, name: lead.name, phone: lead.phone, details: lead.details, titlu });
       done = true;
     } catch {
       /* malformed marker — don't save, but keep the chat working */
