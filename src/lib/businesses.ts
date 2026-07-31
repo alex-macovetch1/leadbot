@@ -36,6 +36,9 @@ export type Business = {
   aiCollect: string;            // what it should find out from the visitor
   search?: boolean;             // real-estate: qualify the visitor, then search the listings
   grupe?: boolean;              // școală sportivă: caută grupa liberă și înscrie copilul
+  /* Cererile acestei afaceri pleacă și în amoCRM. Steag separat, ca leadurile
+     celorlalte demonstrații să nu ajungă în CRM-ul unui client anume. */
+  crm?: boolean;
   support?: boolean;            // customer-support desk: route the visitor into one of `topics`
   topics?: SupportTopic[];      // required when support is true
   // Built for one named client rather than as a generic showcase. Hides the
@@ -615,6 +618,7 @@ Do not invent a schedule, an address of a pitch or a price that is not written h
   formal: true,
   clientDemo: true,
   grupe: true,
+  crm: true,
   siteUrl: "https://tracia.md/",
 };
 

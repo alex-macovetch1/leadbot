@@ -82,7 +82,7 @@ export async function POST(request: Request) {
       /* La botii pe grupe, prima bucata din „details" e chiar numele grupei —
          asa lead-ul apare in amoCRM cu titlul cu care lucreaza ei. */
       const titlu = biz.grupe ? String(lead.details).split(" · ")[0].trim() : undefined;
-      await trimiteInAmoCrm({ bizTitle: biz.name, name: lead.name, phone: lead.phone, details: lead.details, titlu });
+      if (biz.crm) await trimiteInAmoCrm({ bizTitle: biz.name, name: lead.name, phone: lead.phone, details: lead.details, titlu });
       done = true;
     } catch {
       /* malformed marker — don't save, but keep the chat working */
