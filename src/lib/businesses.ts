@@ -43,6 +43,10 @@ export type Business = {
   clientDemo?: boolean;
   // Address the visitor with "dumneavoastră" rather than "tu" throughout the widget.
   formal?: boolean;
+  /* Site-ul real al clientului. Când există, demonstrația nu mai e o pagină de
+     prezentare cu un chat mare în ea, ci chiar site-ul lor cu asistentul pornit
+     în colț — omul vede exact ce ar avea, nu o descriere a ceea ce ar avea. */
+  siteUrl?: string;
 };
 
 const REALESTATE: Business = {
@@ -654,6 +658,7 @@ DISCRETION: many of the requests here are intimate or embarrassing — haemorrho
     "what procedure or problem brings them in, whether they have been to LaserMed before, and which days or hours suit them for a consultation",
   clientDemo: true,
   formal: true,
+  siteUrl: "https://www.lasermed.md/ro",
 };
 
 export const BUSINESSES: Record<string, Business> = {

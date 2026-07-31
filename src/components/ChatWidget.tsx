@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ChatPanel, { type WidgetBiz } from "./ChatPanel";
 import { UI } from "@/lib/flow";
 
@@ -10,15 +10,24 @@ export default function ChatWidget({
   biz,
   className = "",
   appearAfter = 0,
+  autoOpenAfter = 0,
 }: {
   biz: WidgetBiz;
   className?: string;
   /** show the floating button only after this many pixels of scroll */
   appearAfter?: number;
+  /** open the chat by itself after this many ms, as a real site widget does */
+  autoOpenAfter?: number;
 }) {
   const [open, setOpen] = useState(false);
   const [visible, setVisible] = useState(appearAfter === 0);
   const accent = biz.accent;
+  // Odată ce omul a atins butonul, nu-i mai deschidem noi nimic peste el.
+  const atins = useRef(false);
+  const deschide = (v: boolean) => {
+    atins.current = true;
+    setOpen(v);
+  };
 
   useEffect(() => {
     if (appearAfter === 0) return;
@@ -28,11 +37,19 @@ export default function ChatWidget({
     return () => window.removeEventListener("scroll", onScroll);
   }, [appearAfter]);
 
+  useEffect(() => {
+    if (!autoOpenAfter) return;
+    const t = setTimeout(() => {
+      if (!atins.current) setOpen(true);
+    }, autoOpenAfter);
+    return () => clearTimeout(t);
+  }, [autoOpenAfter]);
+
   return (
     <div className={className}>
       {!open && (
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => deschide(true)}
           aria-label={UI.openLabel.ro}
           aria-hidden={!visible}
           tabIndex={visible ? 0 : -1}
@@ -57,7 +74,7 @@ export default function ChatWidget({
         <div className="fixed bottom-4 left-4 right-4 z-50 sm:left-auto">
           <ChatPanel
             biz={biz}
-            onClose={() => setOpen(false)}
+            onClose={() => deschide(false)}
             className="panel-glow h-[min(78vh,560px)] w-full sm:w-[380px]"
           />
         </div>

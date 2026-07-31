@@ -36,6 +36,37 @@ export default async function Home({
     formal: biz.formal,
   };
 
+  /* Demonstrație pe site-ul real al clientului: nicio pagină de prezentare, doar
+     site-ul lor așa cum e acum și asistentul care se deschide singur în colț —
+     exact ce ar vedea un pacient a doua zi după instalare. */
+  if (biz.clientDemo && biz.siteUrl) {
+    return (
+      <div style={{ "--a": biz.accent } as CSSProperties} className="sd">
+        <header className="sd-bar">
+          <span className="sd-tag">
+            <i />
+            Demonstrație · asistentul AI pornit pe site-ul {biz.name}
+          </span>
+          <span className="sd-note">
+            Site-ul dumneavoastră e afișat live, așa cum e acum — nu s-a modificat nimic pe el.
+          </span>
+          <a className="sd-call" href="tel:+37369859888">
+            Alexandru Macovetchi · +373 69 859 888
+          </a>
+        </header>
+
+        <iframe
+          className="sd-frame"
+          src={biz.siteUrl}
+          title={`Site-ul ${biz.name}`}
+          sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+        />
+
+        <ChatWidget biz={widgetBiz} autoOpenAfter={2800} />
+      </div>
+    );
+  }
+
   return (
     <div style={{ "--a": biz.accent } as CSSProperties} className="lb">
       {/* ── nav ── */}
