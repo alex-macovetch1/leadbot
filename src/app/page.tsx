@@ -296,6 +296,7 @@ const DEMO_REQUEST: Record<string, string> = {
   fitness: "Abonament lunar, vrea să înceapă săptămâna asta",
   scoala: "Categoria B, întreabă când începe grupa nouă",
   fotbal: "Băiat de 4 ani, întreabă de antrenamentul de probă",
+  lasermed: "Aluniță pe spate, cere consultație — poate veni sâmbătă dimineața",
   service: "Schimb de ulei și verificat frânele, Logan 2016",
   cazare: "Două nopți pentru 3 persoane, weekendul viitor",
   constructii: "Renovare baie 6 m², cere deviz",

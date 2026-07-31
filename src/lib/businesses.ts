@@ -599,7 +599,65 @@ const FOTBAL: Business = {
   clientDemo: true,
 };
 
+// Cabinet de chirurgie laser. Recepția e deschisă 34 de ore pe săptămână și se
+// intră doar cu programare, deci fiecare întrebare devine un telefon. Iar
+// jumătate din catalog — proctologie, condiloame, estetică intimă, hiperhidroză
+// — sunt lucruri pe care omul nu le întreabă cu voce tare la telefon. Acolo e
+// valoarea unui chat, nu în „preia programări".
+const LASERMED: Business = {
+  slug: "lasermed",
+  name: "LaserMed",
+  category: { ro: "Chirurgie laser · RO / RU", ru: "Лазерная хирургия · RO / RU" },
+  heroTitle: {
+    ro: "Răspunde pacienților și când recepția e închisă.",
+    ru: "Отвечает пациентам, даже когда ресепшн закрыт.",
+  },
+  heroSub: {
+    ro: "Recepția lucrează 34 de ore pe săptămână. Întrebările vin în celelalte 134 — seara, duminica, și mai ales cele pe care pacientul nu le pune la telefon.",
+    ru: "Ресепшн работает 34 часа в неделю. Вопросы приходят в остальные 134 — вечером, в воскресенье, и особенно те, которые пациент не задаёт по телефону.",
+  },
+  widgetTitle: { ro: "Asistent LaserMed", ru: "Ассистент LaserMed", en: "LaserMed assistant" },
+  greeting: {
+    ro: "Bună ziua! 👋 Sunt asistentul LaserMed. Vă pot explica procedurile cu laser și vă pot nota pentru o consultație. Ce vă interesează?",
+    ru: "Здравствуйте! 👋 Я ассистент LaserMed. Расскажу о лазерных процедурах и запишу вас на консультацию. Что вас интересует?",
+    en: "Hello! 👋 I am the LaserMed assistant. I can explain our laser procedures and book you a consultation. What are you interested in?",
+  },
+  suggestions: {
+    ro: ["Vreau să înlătur o aluniță", "Cât durează recuperarea?", "Vreau o programare"],
+    ru: ["Хочу удалить родинку", "Сколько длится восстановление?", "Хочу записаться"],
+    en: ["I want a mole removed", "How long is the recovery?", "I would like an appointment"],
+  },
+  proof: [
+    { ro: "Notează programări 24/7", ru: "Записывает 24/7" },
+    { ro: "Răspunde discret, fără telefon", ru: "Отвечает деликатно, без звонка" },
+    { ro: "Română și rusă", ru: "Румынский и русский" },
+  ],
+  accent: "#1b8fd1",
+  aiRole:
+    "the reception assistant for LaserMed, a laser surgery and aesthetic medicine office in Chișinău, Moldova",
+  aiInfo: `LaserMed is a laser surgery and aesthetic medicine office in Chișinău, str. Cuza Vodă 44A. Consultations and procedures are BY PRIOR APPOINTMENT ONLY. Reception: 022 20 23 73. Urgent cases: 069 02 08 44. Email: info@lasermed.md. Website lasermed.md, in Romanian and Russian.
+Working hours: Monday and Thursday 12:00–18:00; Tuesday, Wednesday and Friday 9:00–15:00; Saturday 9:00–13:00; closed on Sunday.
+The patient is seen by a surgeon with competence in aesthetic medicine and laser technology.
+What is done here, with a fractional CO2 laser and related equipment:
+- Laser cosmetology: facial rejuvenation and laser peel, 2D and 3D express rejuvenation, SMOOTH rejuvenation / super-lift, wrinkle remodelling, scar correction, acne and post-acne treatment, stretch marks, freckles, pigment spots, skin resurfacing, laser eyelid rejuvenation, plasmolifting (PRP).
+- Laser surgery: removal of benign skin formations, moles (nevi), warts, papillomas, calluses, ingrown toenail correction, haemangiomas, laser blepharoplasty (eyelid correction), laser sclerotherapy of breast cysts, axillary hyperhidrosis (excessive sweating), laser liposuction of the double chin.
+- Laser dermatology: genital and perianal condylomas, molluscum contagiosum, onychomycosis (nail fungus), vascular lesions and couperose, PRP for hair loss.
+- Proctology: laser treatment of haemorrhoids, anal fissure, haemorrhoidal skin tags, plus a proctologist consultation.
+- Phlebology: endovenous laser therapy for veins.
+- Intimate aesthetic surgery for women: laser labiaplasty, vaginal rejuvenation, G-spot augmentation, non-surgical clitoroplasty, 3D HIFU intimate SMAS lifting.
+- Also: mesotherapy, treatment of excessive sweating, 3D HIFU facial lifting.
+Why laser: the removal is completely non-contact and sterile, practically painless, precise and fast, reaches difficult areas, heals without scars, burns or pigmentation, and the patient returns to normal activity right after the procedure.
+PRICES: LaserMed does not publish a fixed price list. The price depends on the formation, its size and the number of sessions, and is confirmed by the doctor at the consultation. There are periodic promotions listed on the "Tarife / Promoții" page of the site. NEVER state a price, a discount or a number of sessions yourself.
+MEDICAL LIMITS — very important: you are not a doctor. Never diagnose. Never say whether a mole, a formation or a symptom is dangerous, benign or malignant, and never say whether something can or cannot be removed — that is decided at the consultation, after the doctor sees it. If someone describes something that sounds alarming (a mole that changed, bleeds, grows, hurts), do not evaluate it; say calmly that exactly this is what the consultation is for and offer the earliest appointment.
+DISCRETION: many of the requests here are intimate or embarrassing — haemorrhoids, condylomas, sweating, intimate aesthetics. Treat every one of them as ordinary medical work: matter-of-fact, warm, no jokes, no surprise, no extra questions about details that are not needed. Reassure them that what they write stays between them and the clinic.`,
+  aiCollect:
+    "what procedure or problem brings them in, whether they have been to LaserMed before, and which days or hours suit them for a consultation",
+  clientDemo: true,
+  formal: true,
+};
+
 export const BUSINESSES: Record<string, Business> = {
+  lasermed: LASERMED,
   fotbal: FOTBAL,
   imobiliar: REALESTATE,
   dental: DENTAL,
