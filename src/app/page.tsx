@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import ChatPanel from "@/components/ChatPanel";
@@ -17,6 +18,19 @@ const DEMOS = [
   "fitness",
   "scoala",
 ] as const;
+
+/* Pe demonstrația care rulează peste site-ul clientului nu mai e nimic de-al
+   nostru pe ecran, deci titlul filei rămâne singurul loc care spune ce e. */
+export async function generateMetadata({
+  searchParams,
+}: {
+  searchParams: Promise<{ b?: string }>;
+}): Promise<Metadata> {
+  const { b } = await searchParams;
+  const biz = getBusiness(b ?? slugDinGazda((await headers()).get("host") ?? ""));
+  if (!(biz.clientDemo && biz.siteUrl)) return {};
+  return { title: `Demonstrație · asistent AI pentru ${biz.name}` };
+}
 
 export default async function Home({
   searchParams,
@@ -42,19 +56,6 @@ export default async function Home({
   if (biz.clientDemo && biz.siteUrl) {
     return (
       <div style={{ "--a": biz.accent } as CSSProperties} className="sd">
-        <header className="sd-bar">
-          <span className="sd-tag">
-            <i />
-            Demonstrație · asistentul AI pornit pe site-ul {biz.name}
-          </span>
-          <span className="sd-note">
-            Site-ul dumneavoastră e afișat live, așa cum e acum — nu s-a modificat nimic pe el.
-          </span>
-          <a className="sd-call" href="tel:+37369859888">
-            Alexandru Macovetchi · +373 69 859 888
-          </a>
-        </header>
-
         <iframe
           className="sd-frame"
           src={biz.siteUrl}
@@ -62,7 +63,7 @@ export default async function Home({
           sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
         />
 
-        <ChatWidget biz={widgetBiz} autoOpenAfter={2800} />
+        <ChatWidget biz={widgetBiz} autoOpenAfter={4200} />
       </div>
     );
   }

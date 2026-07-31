@@ -55,7 +55,7 @@ export default function ChatWidget({
           tabIndex={visible ? 0 : -1}
           style={{ backgroundColor: accent }}
           className={
-            "fixed bottom-5 right-5 z-50 flex items-center gap-2.5 rounded-full px-5 py-3.5 text-white shadow-lg shadow-black/40 transition-all duration-300 hover:brightness-110 active:scale-95 " +
+            "lb-launch fixed bottom-5 right-5 z-50 flex items-center gap-3 rounded-full px-7 py-4 text-white shadow-xl shadow-black/40 transition-[filter,transform] duration-300 hover:brightness-110 active:scale-95 " +
             (visible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-4 opacity-0")
           }
         >
@@ -63,10 +63,10 @@ export default function ChatWidget({
             <ChatIcon />
             <span
               style={{ boxShadow: `0 0 0 2px ${accent}` }}
-              className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-emerald-300"
+              className="absolute -right-1.5 -top-1.5 h-2.5 w-2.5 rounded-full bg-emerald-300"
             />
           </span>
-          <span className="text-sm font-semibold">{UI.openLabel.ro}</span>
+          <span className="text-base font-semibold">{UI.openLabel.ro}</span>
         </button>
       )}
 
@@ -85,7 +85,7 @@ export default function ChatWidget({
 
 function ChatIcon() {
   return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
     </svg>
   );

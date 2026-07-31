@@ -743,56 +743,43 @@ body {
 }
 
 /* ══════════════════════════════════════════════════════════════
-   Demonstrație pe site-ul real al clientului: bară subțire de
-   context sus, site-ul lor dedesubt, asistentul plutind deasupra.
-   Bara spune limpede că e o demonstrație și că site-ul nu a fost
-   atins — altfel omul crede că i-am umblat în site.
+   Demonstrație pe site-ul real al clientului: nimic de-al nostru
+   pe ecran, doar site-ul lor viu și asistentul în colț. Orice
+   bandă sau siglă de-a noastră ar rupe exact iluzia care vinde.
    ══════════════════════════════════════════════════════════════ */
 .sd {
   display: flex;
   flex-direction: column;
   height: 100dvh;
-  background: var(--bg);
+  background: #ffffff;
 }
-
-.sd-bar {
-  flex: none;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 10px clamp(12px, 2vw, 20px);
-  background: var(--bg);
-  border-bottom: 1px solid var(--line);
-  color: var(--text);
-  font-size: 13px;
-  line-height: 1.35;
-}
-
-.sd-tag { display: flex; align-items: center; gap: 9px; font-weight: 600; }
-.sd-tag i {
-  width: 8px; height: 8px; border-radius: 999px; flex: none;
-  background: var(--a);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--a) 28%, transparent);
-}
-
-.sd-note { color: var(--muted); margin-inline: auto; text-align: center; }
-
-.sd-call {
-  flex: none;
-  padding: 6px 13px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: var(--text);
-  text-decoration: none;
-  white-space: nowrap;
-  transition: border-color 0.2s, background 0.2s;
-}
-.sd-call:hover { border-color: var(--a); background: color-mix(in oklab, var(--a) 12%, transparent); }
 
 .sd-frame { flex: 1; width: 100%; border: 0; background: #ffffff; }
 
-@media (max-width: 980px) { .sd-note { display: none; } .sd-tag { margin-inline-end: auto; } }
-@media (max-width: 620px) {
-  .sd-bar { font-size: 12px; gap: 10px; }
-  .sd-call { padding: 5px 10px; }
+/* Butonul de chat: intră crescând și trimite câteva cercuri, ca să-l
+   vadă omul care tocmai a deschis pagina. Două pulsuri, apoi se oprește —
+   un buton care pulsează la nesfârșit devine reclamă și se ignoră. */
+@keyframes lb-pop {
+  0%   { transform: scale(0.5); opacity: 0; }
+  62%  { transform: scale(1.07); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes lb-ring {
+  0%   { box-shadow: 0 0 0 0 color-mix(in oklab, var(--a) 58%, transparent); }
+  70%  { box-shadow: 0 0 0 22px color-mix(in oklab, var(--a) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in oklab, var(--a) 0%, transparent); }
+}
+
+.lb-launch { animation: lb-pop 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.25) both; }
+.lb-launch::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  pointer-events: none;
+  animation: lb-ring 2.1s ease-out 0.45s 2;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lb-launch, .lb-launch::after { animation: none; }
 }
