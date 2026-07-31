@@ -783,3 +783,101 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .lb-launch, .lb-launch::after { animation: none; }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   Tabla de cereri (/bord). Aceeași formă cu care lucrează clientul
+   în CRM-ul lui: fișe pe coloane, care se mută cu un click. O fișă
+   nouă se aprinde câteva secunde, ca omul să o vadă apărând.
+   ══════════════════════════════════════════════════════════════ */
+.bd {
+  --verde: #15803d;
+  min-height: 100dvh;
+  background: #f4f5f3;
+  color: #0e1116;
+  display: flex;
+  flex-direction: column;
+}
+
+.bd-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px clamp(12px, 2.5vw, 26px);
+  background: #ffffff;
+  border-bottom: 1px solid #e3e5e0;
+}
+.bd-titlu { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 15px; }
+.bd-titlu i {
+  width: 9px; height: 9px; border-radius: 999px; background: var(--verde);
+  box-shadow: 0 0 0 4px color-mix(in oklab, var(--verde) 20%, transparent);
+  animation: bd-puls 2s ease-in-out infinite;
+}
+@keyframes bd-puls { 50% { box-shadow: 0 0 0 8px color-mix(in oklab, var(--verde) 0%, transparent); } }
+.bd-live { color: #6b7280; font-size: 13px; margin-inline-start: auto; }
+
+.bd-coloane {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(240px, 1fr));
+  gap: 12px;
+  padding: clamp(12px, 2vw, 22px);
+  overflow-x: auto;
+  align-items: start;
+}
+
+.bd-col { background: #eceee9; border-radius: 14px; padding: 12px; min-width: 240px; }
+.bd-col h2 {
+  display: flex; align-items: center; justify-content: space-between;
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.07em;
+  color: #5b6472; margin: 2px 4px 12px;
+}
+.bd-col h2 b {
+  background: #ffffff; color: #0e1116; border-radius: 999px;
+  padding: 1px 8px; font-size: 12px;
+}
+
+.bd-stiva { display: flex; flex-direction: column; gap: 10px; }
+
+.bd-fisa {
+  background: #ffffff;
+  border: 1px solid #e3e5e0;
+  border-radius: 12px;
+  padding: 12px 13px;
+  box-shadow: 0 1px 2px rgba(16, 20, 26, 0.05);
+}
+.bd-fisa-sus { display: flex; align-items: baseline; gap: 8px; margin-bottom: 8px; }
+.bd-grupa { font-weight: 700; font-size: 14px; }
+.bd-cand { color: #8a93a1; font-size: 11px; margin-inline-start: auto; white-space: nowrap; }
+
+.bd-fisa dl { display: flex; flex-direction: column; gap: 3px; margin: 0 0 10px; }
+.bd-fisa dl > div { display: flex; gap: 6px; font-size: 12.5px; line-height: 1.4; }
+.bd-fisa dt { color: #8a93a1; flex: none; }
+.bd-fisa dd { margin: 0; color: #26303c; }
+
+.bd-act { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.bd-tel {
+  font-weight: 600; font-size: 13px; color: var(--verde); text-decoration: none;
+  border: 1px solid color-mix(in oklab, var(--verde) 35%, #ffffff);
+  background: color-mix(in oklab, var(--verde) 8%, #ffffff);
+  border-radius: 999px; padding: 4px 11px;
+}
+.bd-act button {
+  margin-inline-start: auto; border: 1px solid #e3e5e0; background: #ffffff;
+  border-radius: 999px; padding: 4px 10px; font-size: 12px; color: #46505f; cursor: pointer;
+}
+.bd-act button:hover { border-color: var(--verde); color: var(--verde); }
+
+.bd-gol { color: #98a1ae; font-size: 12.5px; margin: 4px; line-height: 1.5; }
+
+/* Fișa proaspăt intrată: se aprinde, apoi se stinge singură. */
+.bd-noua { animation: bd-intra 0.45s ease-out both, bd-aprinsa 6s ease-out both; }
+@keyframes bd-intra { from { transform: translateY(-8px); opacity: 0; } }
+@keyframes bd-aprinsa {
+  0%, 55% { border-color: var(--verde); box-shadow: 0 0 0 3px color-mix(in oklab, var(--verde) 18%, transparent); }
+  100% { border-color: #e3e5e0; box-shadow: 0 1px 2px rgba(16, 20, 26, 0.05); }
+}
+
+@media (max-width: 900px) { .bd-coloane { grid-template-columns: repeat(4, 84vw); } }
+@media (prefers-reduced-motion: reduce) { .bd-noua, .bd-titlu i { animation: none; } }
